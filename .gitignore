@@ -32,6 +32,15 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# örnek dosya depoda dursun, gerçek anahtarlar içermiyor
+!.env.example
+
+# supabase yerel geliştirme çıktıları
+/supabase/.branches
+/supabase/.temp
+
+# node_modules'tan kopyalanan ZXing WASM dosyası (npm run sync:wasm üretir)
+/public/zxing/
 
 # vercel
 .vercel
@@ -39,3 +48,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Ajan araçlarının indirdiği yetenek dosyaları. node_modules gibi: içerik dışarıdan
+# geliyor, hangi sürümün kullanıldığını skills-lock.json zaten kaydediyor.
+/.agents/
+/.claude/

@@ -1,1 +1,181 @@
 @import "tailwindcss";
+
+/*
+  Mağaza uygulamasının görsel dili: zinc yüzeyler + emerald aksiyon rengi.
+  Renkler Tailwind paletinden geldiği için burada sadece uygulamaya özel
+  anlamsal isimleri ve tipografiyi tanımlıyoruz.
+*/
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* Dokunmatik kullanımda gri parlama kutu tasarımını bozuyor */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*
+  Uygulama ana ekrana eklendiğinde (standalone PWA) iOS'ta çentik ve alt
+  gezinme çubuğu içeriğin üstüne biniyor; güvenli alan dolgularını utility
+  olarak tanımlıyoruz.
+*/
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+/*
+  ETİKET BASIMI
+
+  Etiketin fiziksel ölçüleri burada, milimetre cinsinden veriliyor. Bileşendeki
+  Tailwind ölçüleri yalnızca ekran önizlemesi için: piksel ölçüleri yazıcıda
+  tarayıcı ve çözünürlüğe göre değişiyor, bir karekodun kaç milimetre basıldığı
+  ise okunabilirliği doğrudan belirliyor.
+
+  Bu kurallar Tailwind'in `@layer` bloklarının dışında yazıldığı için katmanlı
+  utility sınıflarını (örn. grid-cols-3) özgüllükten bağımsız olarak geçersiz
+  kılıyor; ekran düzeni ile baskı düzeni birbirine karışmıyor.
+*/
+@media print {
+  @page {
+    margin: 8mm;
+  }
+
+  /* Etiket sayfası: A4'te üç sütun, termalde tek sütun. */
+  .label-sheet {
+    display: grid;
+    gap: 2mm;
+  }
+
+  .label-sheet[data-format="a4"] {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .label-sheet[data-format="thermal"] {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  /* Bir etiket sayfa sonunda ikiye bölünürse hiçbir işe yaramaz. */
+  .label-cell {
+    break-inside: avoid;
+  }
+
+  /*
+    Termal etiket yazıcısında her etiket ayrı bir kağıt parçası. Sonuncudan sonra
+    sayfa atılmıyor; atılsaydı her baskıda bir boş etiket harcanırdı.
+  */
+  .label-sheet[data-format="thermal"] .label-cell {
+    break-after: page;
+  }
+
+  .label-sheet[data-format="thermal"] .label-cell--last {
+    break-after: auto;
+  }
+
+  .label-tag {
+    min-height: 30mm;
+    padding: 2mm;
+    /* Baskıda gri tonlar soluk çıkıyor; kesme/yapıştırma çizgisi net olmalı. */
+    border-color: #000;
+    border-radius: 1mm;
+  }
+
+  .label-tag__shelf {
+    font-size: 6pt;
+  }
+
+  .label-tag__name {
+    font-size: 8.5pt;
+  }
+
+  .label-tag__price {
+    font-size: 19pt;
+  }
+
+  .label-tag__currency {
+    font-size: 10pt;
+  }
+
+  .label-tag__meta {
+    font-size: 5.5pt;
+  }
+
+  .label-tag__code {
+    font-size: 6pt;
+  }
+
+  /*
+    18 mm'lik karekod, tipik etiket adresinde 33x33 modül demek: modül başına
+    ~0,55 mm. Telefon kameraları bu yoğunluğu 15-20 cm mesafeden rahat okuyor.
+  */
+  .label-tag__qr {
+    width: 18mm;
+    height: 18mm;
+  }
+
+  /*
+    TERMAL ETİKET
+
+    Termal yazıcıda kağıt, etiketin kendisi. Adlandırılmış sayfa kuralıyla ölçü ve
+    kenar boşluğu doğrudan veriliyor: 58x40 mm yaygın bir raf etiketi ölçüsü,
+    2 mm kenar boşluğu da bu ölçüde kullanılabilir alanı 54x36 mm'de tutuyor.
+    Varsayılan 8 mm boşluk bırakılsaydı etiketin yarısı kenar boşluğu olurdu.
+
+    Adlandırılmış sayfa kuralını desteklemeyen tarayıcıda (örn. eski Safari)
+    davranış yumuşak bozuluyor: ölçü yazdırma penceresinden gelir, her etiket yine
+    ayrı sayfaya basılır (break-after) ve yüksekliği 36 mm'de kalır.
+
+    Ölçüler A4'ten KÜÇÜK: etiket yüksekliği 36 mm'ye sığmak zorunda. A4
+    ölçüleriyle (18 mm karekod, 19 pt fiyat) içerik 38 mm'ye çıkıp her etiket iki
+    sayfaya taşıyordu, yani her baskıda yarısı boş etiket çıkıyordu.
+
+    Karekod 15 mm: tipik etiket adresinde modül başına ~0,45 mm. Raf etiketi
+    kol mesafesinden okutulduğu için bu yoğunluk yeterli.
+  */
+  @page label-roll {
+    size: 58mm 40mm;
+    margin: 2mm;
+  }
+
+  .label-sheet[data-format="thermal"] .label-cell {
+    page: label-roll;
+  }
+
+  .label-sheet[data-format="thermal"] .label-tag {
+    min-height: 0;
+    height: 36mm;
+    padding: 1.5mm;
+    gap: 1mm;
+  }
+
+  .label-sheet[data-format="thermal"] .label-tag__shelf {
+    font-size: 5.5pt;
+  }
+
+  .label-sheet[data-format="thermal"] .label-tag__name {
+    font-size: 8pt;
+  }
+
+  .label-sheet[data-format="thermal"] .label-tag__price {
+    font-size: 17pt;
+  }
+
+  .label-sheet[data-format="thermal"] .label-tag__currency {
+    font-size: 9pt;
+  }
+
+  .label-sheet[data-format="thermal"] .label-tag__qr {
+    width: 15mm;
+    height: 15mm;
+  }
+}

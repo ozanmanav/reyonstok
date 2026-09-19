@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="ReyonStok">
+  <!--
+    Maskelenebilir (maskable) ikon kaynağı.
+
+    Android ikonu daire, squircle veya damla biçiminde kırpıyor. Şartname
+    kırpmanın kenarlardan %10'a kadar yiyebileceğini söylüyor; bu yüzden zemin
+    köşesiz tam taşma ve işaret merkezdeki güvenli daireye (yarıçapın %40'ı)
+    sığacak kadar küçük tutuldu. icon.svg buraya konsaydı desenin kenarları
+    kırpılırdı.
+  -->
+  <rect width="512" height="512" fill="#18181b"/>
+  <path d="M148 148h216v216H148z" fill="#34d399"/>
+  <path d="M179 179h154v154H179z" fill="#18181b"/>
+  <path d="M210 210h92v92H210z" fill="#34d399"/>
+</svg>

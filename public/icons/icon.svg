@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="ReyonStok">
+  <!--
+    Uygulama ikonu kaynağı.
+
+    İşaret, karekodun konum belirleme deseni (finder pattern): 7x7 modül, modül
+    44 px. Uygulamanın tek işi karekod okutmak olduğu için ikon da bunu
+    anlatıyor; harf monogramı küçük boyutta daha okunur ama ne işe yaradığını
+    söylemiyor.
+
+    Renkler uygulamanın görsel diliyle aynı: zinc-950 zemin, emerald-400 işaret.
+
+    PNG'ler bu dosyadan üretiliyor: node scripts/generate-icons.mjs
+  -->
+  <rect width="512" height="512" rx="112" fill="#18181b"/>
+  <path d="M96 96h308v308H96z" fill="#34d399"/>
+  <path d="M140 140h220v220H140z" fill="#18181b"/>
+  <path d="M184 184h132v132H184z" fill="#34d399"/>
+  <rect x="416" y="416" width="44" height="44" rx="8" fill="#34d399"/>
+</svg>

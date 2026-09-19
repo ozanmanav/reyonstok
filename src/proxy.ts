@@ -60,8 +60,13 @@ export const config = {
    * `zxing/` özellikle dışarıda: barkod okuyucunun 1 MB'lık WebAssembly dosyası
    * burada duruyor ve her istekte oturum doğrulamasından geçirmek gereksiz
    * gecikme demek. Dosya gizli bir veri içermiyor, genel bir kütüphane.
+   *
+   * `icon.png` ve `apple-icon.png`, Next.js'in app dizini kuralıyla ürettiği
+   * simge yolları. Listede olmasalardı giriş yapmamış tarayıcı simgeyi isterken
+   * /login'e yönlendirilir; giriş sayfası simgesiz görünür ve telefon "ana
+   * ekrana ekle" sırasında ikonu alamazdı.
    */
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|icons/|zxing/).*)',
+    '/((?!_next/static|_next/image|favicon.ico|icon.png|apple-icon.png|manifest.webmanifest|icons/|zxing/).*)',
   ],
 };

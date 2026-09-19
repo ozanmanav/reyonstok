@@ -101,6 +101,80 @@ describe('proxy yönlendirmeleri', () => {
   });
 });
 
+describe('PWA varlıkları', () => {
+  /**
+   * Manifest ve ikonlar oturum GEREKTİRMEMELİ.
+   *
+   * Proxy varsayılan olarak her yolu karşılıyor; bu dosyalar eşleştirme
+   * listesinden muaf tutulmazsa telefon "ana ekrana ekle" sırasında manifesti ve
+   * ikonu alamıyor, giriş sayfası da simgesiz görünüyor. Hata sessiz: uygulama
+   * çalışmaya devam ediyor, yalnızca kurulamıyor.
+   */
+  const publicAssets = [
+    '/manifest.webmanifest',
+    '/icon.png',
+    '/apple-icon.png',
+    '/icons/icon-192.png',
+    '/icons/icon-512.png',
+    '/icons/icon-maskable-512.png',
+  ];
+
+  test.for(publicAssets)('%s oturumsuz erişilebilir', async (path) => {
+    const response = await fetch(`${BASE_URL}${path}`, { redirect: 'manual' });
+
+    expect(response.status).toBe(200);
+  });
+
+  test('manifest telefona kurulabilir bir uygulama tanımlıyor', async () => {
+    const manifest = (await (await fetch(`${BASE_URL}/manifest.webmanifest`)).json()) as {
+      name: string;
+      short_name: string;
+      start_url: string;
+      display: string;
+      icons: { src: string; sizes: string; purpose?: string }[];
+      shortcuts?: { url: string }[];
+    };
+
+    expect(manifest.short_name).toBe('ReyonStok');
+    expect(manifest.start_url).toBe('/');
+    // standalone olmadan ana ekrandan açılan uygulama tarayıcı çubuğuyla geliyor.
+    expect(manifest.display).toBe('standalone');
+
+    // Android ikonu kırptığı için maskelenebilir varyant şart.
+    expect(manifest.icons.some((icon) => icon.purpose === 'maskable')).toBe(true);
+    expect(manifest.icons.some((icon) => icon.sizes === '192x192')).toBe(true);
+    expect(manifest.icons.some((icon) => icon.sizes === '512x512')).toBe(true);
+  });
+
+  test('manifestteki her ikon gerçekten sunuluyor', async () => {
+    // Yol yazım hatası manifesti geçerli bırakır ama ikon görünmez olur.
+    const manifest = (await (await fetch(`${BASE_URL}/manifest.webmanifest`)).json()) as {
+      icons: { src: string }[];
+    };
+
+    for (const icon of manifest.icons) {
+      const response = await fetch(`${BASE_URL}${icon.src}`, { redirect: 'manual' });
+
+      expect(response.status, `${icon.src} sunulmuyor`).toBe(200);
+      expect(response.headers.get('content-type')).toContain('image/png');
+    }
+  });
+
+  test('kısayollar uygulama içindeki gerçek sayfalara gidiyor', async () => {
+    const manifest = (await (await fetch(`${BASE_URL}/manifest.webmanifest`)).json()) as {
+      shortcuts?: { url: string }[];
+    };
+
+    for (const shortcut of manifest.shortcuts ?? []) {
+      // Oturumsuz olduğumuz için giriş sayfasına yönlendirilmeli; 404 olmamalı.
+      const response = await fetch(`${BASE_URL}${shortcut.url}`, { redirect: 'manual' });
+
+      expect(response.status, `${shortcut.url} bulunamadı`).not.toBe(404);
+      expect(response.headers.get('location')).toContain('/login');
+    }
+  });
+});
+
 describe('yanıt biçimi', () => {
   test('hatalar { error: { message } } biçiminde döner', async () => {
     const response = await fetch(`${BASE_URL}/api/stock-log`);

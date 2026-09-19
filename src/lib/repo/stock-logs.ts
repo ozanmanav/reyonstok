@@ -38,7 +38,7 @@ const LOG_COLUMNS = `
  */
 export async function getRecentStockLogs(
   supabase: SupabaseClient,
-  limit = 20
+  limit = 20,
 ): Promise<StockLogWithContext[]> {
   const { data, error } = await supabase
     .from('stock_logs')
@@ -57,7 +57,7 @@ export async function getRecentStockLogs(
 export async function getStockLogsForProduct(
   supabase: SupabaseClient,
   productId: number,
-  limit = 10
+  limit = 10,
 ): Promise<StockLogWithContext[]> {
   const { data, error } = await supabase
     .from('stock_logs')

@@ -56,7 +56,7 @@ export async function renderQrSvgMap(values: string[]): Promise<Record<string, s
   const distinct = [...new Set(values)];
 
   const entries = await Promise.all(
-    distinct.map(async (value) => [value, await renderQrSvg(value)] as const)
+    distinct.map(async (value) => [value, await renderQrSvg(value)] as const),
   );
 
   return Object.fromEntries(entries);

@@ -1,6 +1,6 @@
-import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
 import { AUTH_COOKIE_OPTIONS } from './cookies';
 import { supabaseAnonKey, supabaseUrl } from './env';
 

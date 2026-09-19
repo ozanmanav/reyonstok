@@ -175,7 +175,7 @@ export function parseCsv(text: string, delimiter?: CsvDelimiter): string[][] {
  */
 export function toCsv(
   rows: (string | number | null | undefined)[][],
-  options: { delimiter?: CsvDelimiter; withBom?: boolean } = {}
+  options: { delimiter?: CsvDelimiter; withBom?: boolean } = {},
 ): string {
   const delimiter = options.delimiter ?? ';';
   const withBom = options.withBom ?? true;
@@ -190,7 +190,7 @@ export function toCsv(
 /** Gerekliyse hücreyi tırnaklar ve içindeki tırnakları ikiler. */
 function escapeCsvValue(
   value: string | number | null | undefined,
-  delimiter: CsvDelimiter
+  delimiter: CsvDelimiter,
 ): string {
   if (value === null || value === undefined) {
     return '';
@@ -199,10 +199,7 @@ function escapeCsvValue(
   const text = String(value);
 
   const needsQuotes =
-    text.includes(delimiter) ||
-    text.includes('"') ||
-    text.includes('\n') ||
-    text.includes('\r');
+    text.includes(delimiter) || text.includes('"') || text.includes('\n') || text.includes('\r');
 
   if (!needsQuotes) {
     return text;

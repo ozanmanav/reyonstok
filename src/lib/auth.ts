@@ -73,7 +73,7 @@ export async function requireUser(supabase: SupabaseClient): Promise<CurrentUser
  */
 export async function requireRole(
   supabase: SupabaseClient,
-  roles: readonly UserRole[]
+  roles: readonly UserRole[],
 ): Promise<CurrentUser> {
   const user = await requireUser(supabase);
 

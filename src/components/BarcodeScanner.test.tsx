@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import BarcodeScanner from './BarcodeScanner';
 
 /**
@@ -90,9 +90,7 @@ describe('elle kod girişi', () => {
     await userEvent.type(input, 'env-1001');
     await userEvent.click(screen.getByRole('button', { name: 'Ara' }));
 
-    expect(onScan).toHaveBeenCalledWith(
-      expect.objectContaining({ kind: 'qr', code: 'ENV-1001' })
-    );
+    expect(onScan).toHaveBeenCalledWith(expect.objectContaining({ kind: 'qr', code: 'ENV-1001' }));
   });
 
   test('EAN-13 barkodunu doğrulanmış olarak bildirir', async () => {
@@ -104,7 +102,7 @@ describe('elle kod girişi', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Ara' }));
 
     expect(onScan).toHaveBeenCalledWith(
-      expect.objectContaining({ kind: 'ean13', code: '4006381333931' })
+      expect.objectContaining({ kind: 'ean13', code: '4006381333931' }),
     );
   });
 
@@ -163,7 +161,9 @@ describe('duraklatma', () => {
 
   test('kamera istenen yönle açılır', async () => {
     // Reyon etiketi okunacağı için arka kamera istenmeli.
-    const getUserMedia = vi.fn().mockRejectedValue(Object.assign(new Error('x'), { name: 'AbortError' }));
+    const getUserMedia = vi
+      .fn()
+      .mockRejectedValue(Object.assign(new Error('x'), { name: 'AbortError' }));
     Object.defineProperty(navigator, 'mediaDevices', {
       configurable: true,
       value: { getUserMedia },
@@ -176,7 +176,7 @@ describe('duraklatma', () => {
         expect.objectContaining({
           video: { facingMode: { ideal: 'environment' } },
           audio: false,
-        })
+        }),
       );
     });
   });

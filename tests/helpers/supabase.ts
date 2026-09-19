@@ -1,5 +1,5 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { createServerClient } from '@supabase/ssr';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { UserRole } from '@/lib/types';
 
 /**
@@ -22,7 +22,7 @@ export function requireTestEnv(): {
 } {
   if (!url || !anonKey || !serviceRoleKey) {
     throw new Error(
-      'Entegrasyon testleri için .env.local gerekli. `vercel env pull .env.local` çalıştırın.'
+      'Entegrasyon testleri için .env.local gerekli. `vercel env pull .env.local` çalıştırın.',
     );
   }
 
@@ -104,10 +104,7 @@ export async function createTestUser(role: UserRole): Promise<TestUser> {
  *
  * Bu sayede oturum açılmış HTTP istekleri Playwright kurulmadan test edilebilir.
  */
-export async function createSessionCookieHeader(
-  email: string,
-  password: string
-): Promise<string> {
+export async function createSessionCookieHeader(email: string, password: string): Promise<string> {
   const env = requireTestEnv();
   const jar = new Map<string, string>();
 

@@ -13,7 +13,7 @@ export async function connectDb(): Promise<Client> {
 
   if (!connectionString) {
     throw new Error(
-      'POSTGRES_URL_NON_POOLING tanımlı değil. `vercel env pull .env.local` çalıştırın.'
+      'POSTGRES_URL_NON_POOLING tanımlı değil. `vercel env pull .env.local` çalıştırın.',
     );
   }
 

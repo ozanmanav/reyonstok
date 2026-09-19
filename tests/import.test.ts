@@ -1,16 +1,16 @@
 // @vitest-environment node
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import type { ImportedProduct } from '@/lib/product-import';
 import { importProducts } from '@/lib/repo/import';
 import { getProductByCode } from '@/lib/repo/products';
 import { getStockLogsForProduct } from '@/lib/repo/stock-logs';
-import type { ImportedProduct } from '@/lib/product-import';
 import {
   createAdminClient,
   createTestUser,
   deleteProducts,
   deleteTestUser,
-  uniqueProductCode,
   type TestUser,
+  uniqueProductCode,
 } from './helpers/supabase';
 
 /**
@@ -71,7 +71,7 @@ describe('importProducts - yeni kayıtlar', () => {
     const result = await importProducts(
       staffUser.client,
       [product({ name: 'Birinci' }), product({ name: 'İkinci' })],
-      staffUser.id
+      staffUser.id,
     );
 
     expect(result).toMatchObject({ inserted: 2, updated: 0, failures: [] });
@@ -102,7 +102,7 @@ describe('importProducts - yeni kayıtlar', () => {
         { barcode: null, name: 'Kodsuz Bir', shelf_location: 'Reyon K', sale_price: 10 },
         { barcode: null, name: 'Kodsuz İki', shelf_location: 'Reyon K', sale_price: 20 },
       ],
-      staffUser.id
+      staffUser.id,
     );
 
     expect(result.inserted).toBe(2);
@@ -144,8 +144,17 @@ describe('importProducts - güncellemeler', () => {
 
     await importProducts(
       staffUser.client,
-      [{ code, barcode: null, name: 'İlk Hali', shelf_location: 'Reyon A', sale_price: 100, stock_quantity: 5 }],
-      staffUser.id
+      [
+        {
+          code,
+          barcode: null,
+          name: 'İlk Hali',
+          shelf_location: 'Reyon A',
+          sale_price: 100,
+          stock_quantity: 5,
+        },
+      ],
+      staffUser.id,
     );
 
     const result = await importProducts(
@@ -160,7 +169,7 @@ describe('importProducts - güncellemeler', () => {
           stock_quantity: 8,
         },
       ],
-      staffUser.id
+      staffUser.id,
     );
 
     expect(result).toMatchObject({ inserted: 0, updated: 1, failures: [] });
@@ -179,14 +188,32 @@ describe('importProducts - güncellemeler', () => {
 
     await importProducts(
       staffUser.client,
-      [{ code, barcode: null, name: 'Hareketli', shelf_location: 'Reyon A', sale_price: 100, stock_quantity: 5 }],
-      staffUser.id
+      [
+        {
+          code,
+          barcode: null,
+          name: 'Hareketli',
+          shelf_location: 'Reyon A',
+          sale_price: 100,
+          stock_quantity: 5,
+        },
+      ],
+      staffUser.id,
     );
 
     await importProducts(
       staffUser.client,
-      [{ code, barcode: null, name: 'Hareketli', shelf_location: 'Reyon A', sale_price: 120, stock_quantity: 9 }],
-      staffUser.id
+      [
+        {
+          code,
+          barcode: null,
+          name: 'Hareketli',
+          shelf_location: 'Reyon A',
+          sale_price: 120,
+          stock_quantity: 9,
+        },
+      ],
+      staffUser.id,
     );
 
     const saved = await getProductByCode(admin, code);
@@ -242,13 +269,13 @@ describe('importProducts - güncellemeler', () => {
           unit: 'Kutu',
         },
       ],
-      staffUser.id
+      staffUser.id,
     );
 
     await importProducts(
       staffUser.client,
       [{ code, barcode: null, name: 'Kategorili', shelf_location: 'Reyon A', sale_price: 110 }],
-      staffUser.id
+      staffUser.id,
     );
 
     const saved = await getProductByCode(admin, code);
@@ -264,8 +291,16 @@ describe('importProducts - hata yalıtımı', () => {
 
     await importProducts(
       staffUser.client,
-      [{ code: existingCode, barcode, name: 'Barkod Sahibi', shelf_location: 'Reyon A', sale_price: 50 }],
-      staffUser.id
+      [
+        {
+          code: existingCode,
+          barcode,
+          name: 'Barkod Sahibi',
+          shelf_location: 'Reyon A',
+          sale_price: 50,
+        },
+      ],
+      staffUser.id,
     );
 
     const conflictingCode = trackedCode();
@@ -274,10 +309,22 @@ describe('importProducts - hata yalıtımı', () => {
     const result = await importProducts(
       staffUser.client,
       [
-        { code: conflictingCode, barcode, name: 'Çakışan', shelf_location: 'Reyon A', sale_price: 60 },
-        { code: okCode, barcode: null, name: 'Sorunsuz', shelf_location: 'Reyon A', sale_price: 70 },
+        {
+          code: conflictingCode,
+          barcode,
+          name: 'Çakışan',
+          shelf_location: 'Reyon A',
+          sale_price: 60,
+        },
+        {
+          code: okCode,
+          barcode: null,
+          name: 'Sorunsuz',
+          shelf_location: 'Reyon A',
+          sale_price: 70,
+        },
       ],
-      staffUser.id
+      staffUser.id,
     );
 
     expect(result.failures).toHaveLength(1);

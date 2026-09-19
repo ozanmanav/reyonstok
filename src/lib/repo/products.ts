@@ -54,7 +54,7 @@ const PRODUCT_COLUMNS =
  */
 export async function getAllProducts(
   supabase: SupabaseClient,
-  filters: ProductFilters = {}
+  filters: ProductFilters = {},
 ): Promise<Product[]> {
   let query = supabase.from('products').select(PRODUCT_COLUMNS);
 
@@ -67,7 +67,7 @@ export async function getAllProducts(
         `code.ilike.${pattern}`,
         `barcode.ilike.${pattern}`,
         `shelf_location.ilike.${pattern}`,
-      ].join(',')
+      ].join(','),
     );
   }
 
@@ -85,9 +85,7 @@ export async function getAllProducts(
     query = query.eq('is_low_stock', true);
   }
 
-  query = query
-    .order('shelf_location', { ascending: true })
-    .order('name', { ascending: true });
+  query = query.order('shelf_location', { ascending: true }).order('name', { ascending: true });
 
   if (filters.limit) {
     query = query.limit(filters.limit);
@@ -103,7 +101,7 @@ export async function getAllProducts(
 
 export async function getProductById(
   supabase: SupabaseClient,
-  id: number
+  id: number,
 ): Promise<Product | null> {
   const { data, error } = await supabase
     .from('products')
@@ -131,7 +129,7 @@ export async function getProductById(
  */
 export async function getProductByCode(
   supabase: SupabaseClient,
-  rawCode: string
+  rawCode: string,
 ): Promise<Product | null> {
   const scan = normalizeScan(rawCode);
 
@@ -155,7 +153,7 @@ export async function getProductByCode(
 async function findByColumn(
   supabase: SupabaseClient,
   column: 'code' | 'barcode',
-  value: string
+  value: string,
 ): Promise<Product | null> {
   const { data, error } = await supabase
     .from('products')
@@ -178,10 +176,7 @@ async function findByColumn(
  * sonuç verdiğinden uzunluk önce, sonra alfabetik sıralama kullanılıyor.
  */
 export async function getNextProductCode(supabase: SupabaseClient): Promise<string> {
-  const { data, error } = await supabase
-    .from('products')
-    .select('code')
-    .like('code', 'ENV-%');
+  const { data, error } = await supabase.from('products').select('code').like('code', 'ENV-%');
 
   if (error) {
     throw error;
@@ -213,7 +208,7 @@ export async function getNextProductCode(supabase: SupabaseClient): Promise<stri
 export async function createProduct(
   supabase: SupabaseClient,
   input: CreateProductInput,
-  userId: string | null
+  userId: string | null,
 ): Promise<Product> {
   const code = input.code?.trim()
     ? input.code.trim().toUpperCase()
@@ -267,7 +262,7 @@ export async function createProduct(
 export async function updateProduct(
   supabase: SupabaseClient,
   id: number,
-  patch: UpdateProductInput
+  patch: UpdateProductInput,
 ): Promise<Product | null> {
   const row: Record<string, unknown> = {};
 
@@ -307,15 +302,8 @@ export async function updateProduct(
  * @returns Silinen satır varsa true. RLS engellediğinde veya ürün yoksa false;
  * ikisi birbirinden ayırt edilmez, çağıran taraf yetkiyi önceden kontrol eder.
  */
-export async function deleteProduct(
-  supabase: SupabaseClient,
-  id: number
-): Promise<boolean> {
-  const { data, error } = await supabase
-    .from('products')
-    .delete()
-    .eq('id', id)
-    .select('id');
+export async function deleteProduct(supabase: SupabaseClient, id: number): Promise<boolean> {
+  const { data, error } = await supabase.from('products').delete().eq('id', id).select('id');
 
   if (error) {
     throw error;
@@ -343,7 +331,7 @@ export interface AdjustStockInput {
  */
 export async function adjustStockAndPrice(
   supabase: SupabaseClient,
-  input: AdjustStockInput
+  input: AdjustStockInput,
 ): Promise<Product> {
   const { data, error } = await supabase.rpc('adjust_stock_and_price', {
     p_product_id: input.productId,

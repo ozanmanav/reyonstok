@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { ImportedProduct } from '@/lib/product-import';
 import { nextProductCode } from '@/lib/scan-code';
 import type { Product } from '@/lib/types';
-import type { ImportedProduct } from '@/lib/product-import';
 import { getNextProductCode } from './products';
 
 /**
@@ -43,7 +43,7 @@ interface PreparedRow {
 export async function importProducts(
   supabase: SupabaseClient,
   products: ImportedProduct[],
-  userId: string
+  userId: string,
 ): Promise<ImportResult> {
   if (products.length === 0) {
     return { inserted: 0, updated: 0, failures: [] };
@@ -52,7 +52,7 @@ export async function importProducts(
   const prepared = await prepareRows(supabase, products);
   const existing = await fetchExistingByCode(
     supabase,
-    prepared.map((row) => row.code)
+    prepared.map((row) => row.code),
   );
 
   const result: ImportResult = { inserted: 0, updated: 0, failures: [] };
@@ -82,7 +82,7 @@ export async function importProducts(
 /** Kodsuz satırlara sıradaki kodları verir. */
 async function prepareRows(
   supabase: SupabaseClient,
-  products: ImportedProduct[]
+  products: ImportedProduct[],
 ): Promise<PreparedRow[]> {
   // Kodsuz satır varsa numaralandırmayı mevcut en büyük koddan sürdürüyoruz.
   let runningCode = products.some((product) => !product.code)
@@ -121,7 +121,7 @@ async function prepareRows(
 /** İçe aktarılacak kodların mevcut kayıtlarını getirir. */
 async function fetchExistingByCode(
   supabase: SupabaseClient,
-  codes: string[]
+  codes: string[],
 ): Promise<Map<string, Product>> {
   const map = new Map<string, Product>();
 
@@ -155,13 +155,13 @@ async function fetchExistingByCode(
 async function writeChunk(
   supabase: SupabaseClient,
   chunk: PreparedRow[],
-  result: ImportResult
+  result: ImportResult,
 ): Promise<Product[]> {
   const { data, error } = await supabase
     .from('products')
     .upsert(
       chunk.map((row) => row.payload),
-      { onConflict: 'code' }
+      { onConflict: 'code' },
     )
     .select('id, code, stock_quantity, sale_price');
 
@@ -226,7 +226,7 @@ async function writeLogs(
   supabase: SupabaseClient,
   written: Product[],
   existing: Map<string, Product>,
-  userId: string
+  userId: string,
 ): Promise<void> {
   const logs = written.flatMap<StockLogInsert>((product) => {
     const before = existing.get(product.code);

@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
-import { NextResponse, type NextRequest } from 'next/server';
 import type { User } from '@supabase/supabase-js';
+import { type NextRequest, NextResponse } from 'next/server';
 import { AUTH_COOKIE_OPTIONS } from './cookies';
 import { supabaseAnonKey, supabaseUrl } from './env';
 

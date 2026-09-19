@@ -62,7 +62,7 @@ export async function POST(request: Request) {
         barcode: body.barcode === '' ? null : body.barcode,
         code: body.code ?? (await getNextProductCode(supabase)),
       },
-      user.id
+      user.id,
     );
 
     return jsonResponse({ product }, 201);

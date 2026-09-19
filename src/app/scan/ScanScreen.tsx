@@ -117,7 +117,7 @@ export default function ScanScreen({
       setScan(result);
       void lookupCode(result.code);
     },
-    [lookupCode]
+    [lookupCode],
   );
 
   const reset = () => {

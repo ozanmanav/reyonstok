@@ -62,7 +62,7 @@ describe('handleRoute hata çevirisi', () => {
 
   test('barkod çakışmasını 409 ve alana özgü mesajla döndürür', async () => {
     const result = await statusAndMessage(
-      dbError('23505', 'duplicate key value violates unique constraint "products_barcode_key"')
+      dbError('23505', 'duplicate key value violates unique constraint "products_barcode_key"'),
     );
 
     expect(result).toEqual({ status: 409, message: 'Bu barkod başka bir üründe kayıtlı' });
@@ -70,7 +70,7 @@ describe('handleRoute hata çevirisi', () => {
 
   test('ürün kodu çakışmasını 409 ve alana özgü mesajla döndürür', async () => {
     const result = await statusAndMessage(
-      dbError('23505', 'duplicate key value violates unique constraint "products_code_key"')
+      dbError('23505', 'duplicate key value violates unique constraint "products_code_key"'),
     );
 
     expect(result).toEqual({ status: 409, message: 'Bu ürün kodu başka bir üründe kayıtlı' });
@@ -90,7 +90,7 @@ describe('handleRoute hata çevirisi', () => {
 
   test('check kısıtı ihlalini 400 ve anlaşılır mesajla döndürür', async () => {
     const result = await statusAndMessage(
-      dbError('23514', 'violates check constraint "products_stock_non_negative"')
+      dbError('23514', 'violates check constraint "products_stock_non_negative"'),
     );
 
     expect(result).toEqual({ status: 400, message: 'Stok adedi negatif olamaz' });
@@ -98,7 +98,7 @@ describe('handleRoute hata çevirisi', () => {
 
   test('büyük harf kısıtı ihlalini açıklar', async () => {
     const result = await statusAndMessage(
-      dbError('23514', 'violates check constraint "products_code_uppercase"')
+      dbError('23514', 'violates check constraint "products_code_uppercase"'),
     );
 
     expect(result.message).toBe('Ürün kodu büyük harf olmalı');
@@ -112,7 +112,7 @@ describe('handleRoute hata çevirisi', () => {
 
   test('bilinmeyen hatada ayrıntı sızdırmaz', async () => {
     const result = await statusAndMessage(
-      new Error('veritabanı parolası pg://gizli@host reddedildi')
+      new Error('veritabanı parolası pg://gizli@host reddedildi'),
     );
 
     expect(result.status).toBe(500);

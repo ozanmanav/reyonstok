@@ -3,8 +3,8 @@ import { ApiError, handleRoute, jsonResponse } from '@/lib/api';
 import { requireUser } from '@/lib/auth';
 import { getProductByCode } from '@/lib/repo/products';
 import { getStockLogsForProduct } from '@/lib/repo/stock-logs';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { normalizeScan } from '@/lib/scan-code';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 /**
  * GET /api/products/by-code?code=... - taranan değerden ürünü bulur

@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import CreateStaffForm from './CreateStaffForm';
-import { setActiveAction, updateRoleAction } from './actions';
 import { getCurrentUser } from '@/lib/auth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { ROLE_LABELS, type Profile, type UserRole } from '@/lib/types';
+import { type Profile, ROLE_LABELS, type UserRole } from '@/lib/types';
+import { setActiveAction, updateRoleAction } from './actions';
+import CreateStaffForm from './CreateStaffForm';
 
 export const metadata: Metadata = {
   title: 'Personel - ReyonStok',

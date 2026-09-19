@@ -2,8 +2,8 @@
 
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { createStaffAction, type UserActionState } from './actions';
 import { ROLE_LABELS } from '@/lib/types';
+import { createStaffAction, type UserActionState } from './actions';
 
 /** Yeni personel hesabı açma formu. */
 export default function CreateStaffForm() {

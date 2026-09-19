@@ -51,9 +51,7 @@ export interface ScanResult {
  */
 export function ean13CheckDigit(first12: string): number {
   if (!TWELVE_DIGITS.test(first12)) {
-    throw new TypeError(
-      `EAN-13 kontrol hanesi için 12 rakam gerekir, gelen değer: "${first12}"`
-    );
+    throw new TypeError(`EAN-13 kontrol hanesi için 12 rakam gerekir, gelen değer: "${first12}"`);
   }
 
   let sum = 0;

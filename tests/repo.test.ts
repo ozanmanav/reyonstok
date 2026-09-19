@@ -20,8 +20,8 @@ import {
   createTestUser,
   deleteProducts,
   deleteTestUser,
-  uniqueProductCode,
   type TestUser,
+  uniqueProductCode,
 } from './helpers/supabase';
 
 /**
@@ -49,7 +49,7 @@ beforeAll(async () => {
 afterAll(async () => {
   await deleteProducts(createdProductIds);
   await Promise.all(
-    [staffUser, viewerUser, adminUser].filter(Boolean).map((user) => deleteTestUser(user))
+    [staffUser, viewerUser, adminUser].filter(Boolean).map((user) => deleteTestUser(user)),
   );
 });
 
@@ -64,7 +64,7 @@ async function makeProduct(overrides: Parameters<typeof createProduct>[1] | null
       sale_price: 100,
       stock_quantity: 10,
     },
-    staffUser.id
+    staffUser.id,
   );
 
   createdProductIds.push(product.id);
@@ -159,8 +159,8 @@ describe('createProduct', () => {
           shelf_location: 'Repo Reyonu',
           sale_price: 10,
         },
-        viewerUser.id
-      )
+        viewerUser.id,
+      ),
     ).rejects.toThrow();
   });
 });
@@ -239,7 +239,7 @@ describe('getProductByCode', () => {
     expect(await getProductByCode(staffUser.client, '')).toBeNull();
     expect(await getProductByCode(staffUser.client, '   ')).toBeNull();
     expect(
-      await getProductByCode(staffUser.client, 'https://reyonstok.vercel.app/scan')
+      await getProductByCode(staffUser.client, 'https://reyonstok.vercel.app/scan'),
     ).toBeNull();
   });
 });
@@ -456,7 +456,7 @@ describe('adjustStockAndPrice', () => {
     const product = await makeProduct();
 
     await expect(
-      adjustStockAndPrice(viewerUser.client, { productId: product.id, stockDelta: -1 })
+      adjustStockAndPrice(viewerUser.client, { productId: product.id, stockDelta: -1 }),
     ).rejects.toThrow();
   });
 });

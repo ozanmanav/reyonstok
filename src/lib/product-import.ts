@@ -45,15 +45,7 @@ const FIELD_ALIASES: Record<ImportField, string[]> = {
     'shelf location',
   ],
   cost_price: ['alis fiyati', 'alış fiyatı', 'alis', 'alış', 'maliyet', 'cost', 'cost price'],
-  sale_price: [
-    'satis fiyati',
-    'satış fiyatı',
-    'fiyat',
-    'satis',
-    'satış',
-    'price',
-    'sale price',
-  ],
+  sale_price: ['satis fiyati', 'satış fiyatı', 'fiyat', 'satis', 'satış', 'price', 'sale price'],
   stock_quantity: ['stok', 'stok adedi', 'adet', 'miktar', 'stock', 'quantity', 'stock quantity'],
   min_stock_alert: [
     'kritik stok',
@@ -161,10 +153,7 @@ export interface ParsedImport {
  * ("1.234,50"). Ayrıca para simgesi ve boşluk kalabilir.
  */
 export function parseNumericCell(value: string): number | null {
-  const cleaned = value
-    .trim()
-    .replace(/\s/g, '')
-    .replace(/[₺$€]/g, '');
+  const cleaned = value.trim().replace(/\s/g, '').replace(/[₺$€]/g, '');
 
   if (cleaned === '') {
     return null;

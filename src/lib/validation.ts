@@ -84,7 +84,7 @@ export const adjustStockSchema = z
       value.stockDelta !== undefined ||
       value.absoluteStock !== undefined ||
       value.newSalePrice !== undefined,
-    { message: 'Güncellenecek bir değer gönderilmedi' }
+    { message: 'Güncellenecek bir değer gönderilmedi' },
   );
 
 export type CreateProductBody = z.infer<typeof createProductSchema>;

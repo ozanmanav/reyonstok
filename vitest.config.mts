@@ -1,6 +1,6 @@
+import react from '@vitejs/plugin-react';
 import { loadEnv } from 'vite';
 import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
 
 // Entegrasyon testleri Supabase projesine bağlanıyor. `.env.local` dosyasındaki
 // değişkenleri (Vercel'den `vercel env pull` ile geliyor) test sürecine taşıyoruz.

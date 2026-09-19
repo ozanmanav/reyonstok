@@ -191,13 +191,13 @@ describe('nextProductCode', () => {
 describe('buildScanUrl', () => {
   test('etiket için tarama adresi üretir', () => {
     expect(buildScanUrl('ENV-1001', 'https://reyonstok.vercel.app')).toBe(
-      'https://reyonstok.vercel.app/scan?code=ENV-1001'
+      'https://reyonstok.vercel.app/scan?code=ENV-1001',
     );
   });
 
   test('adresin sonundaki eğik çizgiyi tekrarlamaz', () => {
     expect(buildScanUrl('ENV-1001', 'https://reyonstok.vercel.app/')).toBe(
-      'https://reyonstok.vercel.app/scan?code=ENV-1001'
+      'https://reyonstok.vercel.app/scan?code=ENV-1001',
     );
   });
 

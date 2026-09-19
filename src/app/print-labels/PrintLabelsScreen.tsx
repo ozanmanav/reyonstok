@@ -41,7 +41,7 @@ export default function PrintLabelsScreen({
    */
   const selected = useMemo(
     () => products.filter((product) => !excluded.has(product.id)),
-    [products, excluded]
+    [products, excluded],
   );
 
   const lastSelectedId = selected.at(-1)?.id;
@@ -115,9 +115,9 @@ export default function PrintLabelsScreen({
         </p>
 
         <p className="rounded-xl bg-zinc-50 px-3 py-2.5 text-xs leading-relaxed text-zinc-600">
-          Yazdırma penceresinde kenar boşluklarını ve ölçeklendirmeyi değiştirmeyin;
-          karekodun boyutu etikette sabit tutuldu. Termal etiket yazıcısı
-          kullanıyorsanız kağıt boyutunu yazdırma penceresinden seçin.
+          Yazdırma penceresinde kenar boşluklarını ve ölçeklendirmeyi değiştirmeyin; karekodun
+          boyutu etikette sabit tutuldu. Termal etiket yazıcısı kullanıyorsanız kağıt boyutunu
+          yazdırma penceresinden seçin.
         </p>
       </div>
 

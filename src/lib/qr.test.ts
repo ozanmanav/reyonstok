@@ -1,6 +1,7 @@
 // @vitest-environment node
-import { describe, expect, test } from 'vitest';
+
 import QRCode from 'qrcode';
+import { describe, expect, test } from 'vitest';
 import { buildLabelPayload } from './label';
 import { QR_ENCODE_OPTIONS, renderQrSvg, renderQrSvgMap } from './qr';
 

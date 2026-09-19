@@ -1,6 +1,6 @@
-import QrBadge from './QrBadge';
 import { formatPrice, formatShortDate } from '@/lib/format';
 import type { Product } from '@/lib/types';
+import QrBadge from './QrBadge';
 
 /**
  * Rafa yapıştırılan tek bir reyon etiketi.

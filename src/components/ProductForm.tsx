@@ -82,7 +82,10 @@ export default function ProductForm({ mode, initial, productId }: ProductFormPro
     }
 
     const stock = parseDecimal(values.stock_quantity);
-    if (values.stock_quantity.trim() !== '' && (stock === null || !Number.isInteger(stock) || stock < 0)) {
+    if (
+      values.stock_quantity.trim() !== '' &&
+      (stock === null || !Number.isInteger(stock) || stock < 0)
+    ) {
       return 'Stok adedi 0 veya daha büyük bir tam sayı olmalı';
     }
 
@@ -141,7 +144,7 @@ export default function ProductForm({ mode, initial, productId }: ProductFormPro
           method: mode === 'create' ? 'POST' : 'PATCH',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify(payload),
-        }
+        },
       );
 
       const data = (await response.json()) as {
@@ -261,10 +264,7 @@ export default function ProductForm({ mode, initial, productId }: ProductFormPro
         />
 
         <div className="space-y-1.5 sm:col-span-2">
-          <label
-            htmlFor={`${formId}-notes`}
-            className="block text-sm font-semibold text-zinc-700"
-          >
+          <label htmlFor={`${formId}-notes`} className="block text-sm font-semibold text-zinc-700">
             Notlar
           </label>
           <textarea
@@ -283,7 +283,11 @@ export default function ProductForm({ mode, initial, productId }: ProductFormPro
           disabled={pending}
           className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-zinc-400"
         >
-          {pending ? 'Kaydediliyor...' : mode === 'create' ? 'Ürünü kaydet' : 'Değişiklikleri kaydet'}
+          {pending
+            ? 'Kaydediliyor...'
+            : mode === 'create'
+              ? 'Ürünü kaydet'
+              : 'Değişiklikleri kaydet'}
         </button>
         <button
           type="button"

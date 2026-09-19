@@ -1,19 +1,15 @@
 // @vitest-environment node
 import { afterAll, beforeAll, describe, expect, inject, test } from 'vitest';
 import { parseCsv } from '@/lib/csv';
-import {
-  detectColumnMapping,
-  missingRequiredFields,
-  parseImportRows,
-} from '@/lib/product-import';
+import { detectColumnMapping, missingRequiredFields, parseImportRows } from '@/lib/product-import';
 import {
   createAdminClient,
   createSessionCookieHeader,
   createTestUser,
   deleteProducts,
   deleteTestUser,
-  uniqueProductCode,
   type TestUser,
+  uniqueProductCode,
 } from './helpers/supabase';
 
 /**
@@ -89,7 +85,7 @@ beforeAll(async () => {
 afterAll(async () => {
   await deleteProducts(createdProductIds);
   await Promise.all(
-    [adminUser, staffUser, viewerUser].filter(Boolean).map((user) => deleteTestUser(user))
+    [adminUser, staffUser, viewerUser].filter(Boolean).map((user) => deleteTestUser(user)),
   );
 });
 
@@ -280,9 +276,7 @@ describe('tarama ekranı', () => {
     expect(foundHtml).not.toContain('Hızlı düzeltme');
     expect(foundHtml).toContain('Yetkiniz görüntüleme ile sınırlı');
 
-    const missingHtml = await (
-      await request('/scan?code=ENV-98765432', viewerCookie)
-    ).text();
+    const missingHtml = await (await request('/scan?code=ENV-98765432', viewerCookie)).text();
     expect(missingHtml).not.toContain('/products/new');
     expect(missingHtml).toContain('Ürün ekleme yetkiniz yok');
   });
@@ -720,9 +714,7 @@ describe('yeni ürün sayfası', () => {
   });
 
   test('taranan barkod forma yerleşir', async () => {
-    const html = await (
-      await request('/products/new?barcode=4006381333931', staffCookie)
-    ).text();
+    const html = await (await request('/products/new?barcode=4006381333931', staffCookie)).text();
 
     expect(html).toContain('4006381333931');
     expect(html).toContain('Okunan barkod alana yerleştirildi');
@@ -757,7 +749,7 @@ describe('oturumlu API erişimi', () => {
 
     const response = await request(
       `/api/products/by-code?code=${encodeURIComponent(product.code)}`,
-      staffCookie
+      staffCookie,
     );
     const body = (await response.json()) as { product?: { id: number }; scan?: { kind: string } };
 

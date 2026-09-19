@@ -44,7 +44,7 @@ const activeSchema = z.object({
 /** Yeni personel hesabı açar ve rolünü belirler. */
 export async function createStaffAction(
   _previousState: UserActionState,
-  formData: FormData
+  formData: FormData,
 ): Promise<UserActionState> {
   const supabase = await createSupabaseServerClient();
   await requireRole(supabase, ADMIN_ROLES);
@@ -136,10 +136,7 @@ export async function setActiveAction(formData: FormData): Promise<void> {
     return;
   }
 
-  await supabase
-    .from('profiles')
-    .update({ is_active: parsed.isActive })
-    .eq('id', parsed.userId);
+  await supabase.from('profiles').update({ is_active: parsed.isActive }).eq('id', parsed.userId);
 
   revalidatePath('/admin/users');
 }

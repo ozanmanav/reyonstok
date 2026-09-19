@@ -20,7 +20,7 @@ const SOURCE = path.join(
   'zxing-wasm',
   'dist',
   'reader',
-  'zxing_reader.wasm'
+  'zxing_reader.wasm',
 );
 const TARGET_DIR = path.join(process.cwd(), 'public', 'zxing');
 const TARGET = path.join(TARGET_DIR, 'zxing_reader.wasm');
@@ -30,7 +30,7 @@ try {
 } catch {
   console.error(
     `ZXing WASM dosyası bulunamadı: ${SOURCE}\n` +
-      'Bağımlılıklar kurulu mu? `npm install` çalıştırıp tekrar deneyin.'
+      'Bağımlılıklar kurulu mu? `npm install` çalıştırıp tekrar deneyin.',
   );
   process.exit(1);
 }

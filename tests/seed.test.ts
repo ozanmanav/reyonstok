@@ -1,8 +1,8 @@
 // @vitest-environment node
 import { describe, expect, test } from 'vitest';
-import { createAdminClient } from './helpers/supabase';
 import { isValidEan13, normalizeScan } from '@/lib/scan-code';
 import type { Product } from '@/lib/types';
+import { createAdminClient } from './helpers/supabase';
 
 /**
  * Tohum verisinin (supabase/seed.sql) gerçekten kullanılabilir olduğunu
@@ -15,10 +15,7 @@ const admin = createAdminClient();
 
 describe('tohum verisi', () => {
   test('örnek ürünler yüklenmiş', async () => {
-    const { data, error } = await admin
-      .from('products')
-      .select('code')
-      .like('code', 'ENV-%');
+    const { data, error } = await admin.from('products').select('code').like('code', 'ENV-%');
 
     expect(error).toBeNull();
     expect(data?.length).toBeGreaterThanOrEqual(10);

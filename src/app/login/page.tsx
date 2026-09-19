@@ -19,9 +19,7 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
     <div className="mx-auto w-full max-w-sm pt-6 sm:pt-16">
       <div className="mb-6 text-center">
         <h1 className="text-2xl font-black tracking-tight text-zinc-900">ReyonStok</h1>
-        <p className="mt-1 text-sm text-zinc-600">
-          Mağaza karekod, fiyat ve stok takibi
-        </p>
+        <p className="mt-1 text-sm text-zinc-600">Mağaza karekod, fiyat ve stok takibi</p>
       </div>
 
       <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">

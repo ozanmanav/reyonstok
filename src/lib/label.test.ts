@@ -23,20 +23,14 @@ import { normalizeScan } from './scan-code';
 
 describe('resolveSiteUrl', () => {
   test('boşlukları kırpar', () => {
-    expect(resolveSiteUrl('  https://reyonstok.vercel.app  ')).toBe(
-      'https://reyonstok.vercel.app'
-    );
+    expect(resolveSiteUrl('  https://reyonstok.vercel.app  ')).toBe('https://reyonstok.vercel.app');
   });
 
   test('sondaki eğik çizgileri atar', () => {
     // Kullanıcı panele adresi eğik çizgiyle girdiğinde çift eğik çizgili
     // karekod adresi (".../scan" yerine "...//scan") üretilmemeli.
-    expect(resolveSiteUrl('https://reyonstok.vercel.app/')).toBe(
-      'https://reyonstok.vercel.app'
-    );
-    expect(resolveSiteUrl('https://reyonstok.vercel.app///')).toBe(
-      'https://reyonstok.vercel.app'
-    );
+    expect(resolveSiteUrl('https://reyonstok.vercel.app/')).toBe('https://reyonstok.vercel.app');
+    expect(resolveSiteUrl('https://reyonstok.vercel.app///')).toBe('https://reyonstok.vercel.app');
   });
 
   test('yol içeren adresin sonundaki eğik çizgiyi atar, yolu korur', () => {
@@ -61,20 +55,20 @@ describe('siteUrlFromEnv', () => {
       siteUrlFromEnv({
         NEXT_PUBLIC_SITE_URL: 'https://magaza.com/',
         VERCEL_PROJECT_PRODUCTION_URL: 'reyonstok.vercel.app',
-      })
+      }),
     ).toBe('https://magaza.com');
   });
 
   test('adres yoksa Vercel üretim adresine düşer ve protokol ekler', () => {
-    expect(
-      siteUrlFromEnv({ VERCEL_PROJECT_PRODUCTION_URL: 'reyonstok.vercel.app' })
-    ).toBe('https://reyonstok.vercel.app');
+    expect(siteUrlFromEnv({ VERCEL_PROJECT_PRODUCTION_URL: 'reyonstok.vercel.app' })).toBe(
+      'https://reyonstok.vercel.app',
+    );
   });
 
   test('Vercel adresi protokollü gelirse iki kez eklenmez', () => {
-    expect(
-      siteUrlFromEnv({ VERCEL_PROJECT_PRODUCTION_URL: 'https://reyonstok.vercel.app' })
-    ).toBe('https://reyonstok.vercel.app');
+    expect(siteUrlFromEnv({ VERCEL_PROJECT_PRODUCTION_URL: 'https://reyonstok.vercel.app' })).toBe(
+      'https://reyonstok.vercel.app',
+    );
   });
 
   test('hiçbir değişken yoksa boş dize döner', () => {
@@ -158,14 +152,14 @@ describe('siteUrlWarning', () => {
 describe('buildLabelPayload', () => {
   test('gerçek adres varsa tarama bağlantısı gömülür', () => {
     expect(buildLabelPayload('ENV-1001', 'https://reyonstok.vercel.app')).toBe(
-      'https://reyonstok.vercel.app/scan?code=ENV-1001'
+      'https://reyonstok.vercel.app/scan?code=ENV-1001',
     );
   });
 
   test('yerel adres de gömülür', () => {
     // Deneme baskısının yayındaki davranışla aynı olması için.
     expect(buildLabelPayload('ENV-1001', 'http://localhost:3000')).toBe(
-      'http://localhost:3000/scan?code=ENV-1001'
+      'http://localhost:3000/scan?code=ENV-1001',
     );
   });
 

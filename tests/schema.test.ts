@@ -6,8 +6,8 @@ import {
   deleteProducts,
   deleteTestUser,
   seedProduct,
-  uniqueProductCode,
   type TestUser,
+  uniqueProductCode,
 } from './helpers/supabase';
 
 /**
@@ -41,7 +41,7 @@ beforeAll(async () => {
 afterAll(async () => {
   await deleteProducts(createdProductIds);
   await Promise.all(
-    [adminUser, staffUser, viewerUser].filter(Boolean).map((user) => deleteTestUser(user))
+    [adminUser, staffUser, viewerUser].filter(Boolean).map((user) => deleteTestUser(user)),
   );
 });
 
@@ -107,11 +107,7 @@ describe('profiller ve kullanıcı oluşturma', () => {
     // RLS with check koşulu ihlal edildiği için güncelleme reddedilir.
     expect(error).not.toBeNull();
 
-    const { data } = await admin
-      .from('profiles')
-      .select('role')
-      .eq('id', staffUser.id)
-      .single();
+    const { data } = await admin.from('profiles').select('role').eq('id', staffUser.id).single();
 
     expect(data?.role).toBe('staff');
   });
@@ -367,10 +363,7 @@ describe('adjust_stock_and_price', () => {
 
     expect(error).toBeNull();
 
-    const { data: logs } = await admin
-      .from('stock_logs')
-      .select('id')
-      .eq('product_id', product.id);
+    const { data: logs } = await admin.from('stock_logs').select('id').eq('product_id', product.id);
 
     expect(logs).toHaveLength(0);
   });
@@ -443,10 +436,7 @@ describe('adjust_stock_and_price', () => {
 
     expect(data?.stock_quantity).toBe(8);
 
-    const { data: logs } = await admin
-      .from('stock_logs')
-      .select('id')
-      .eq('product_id', product.id);
+    const { data: logs } = await admin.from('stock_logs').select('id').eq('product_id', product.id);
 
     expect(logs).toHaveLength(2);
   });
@@ -459,8 +449,8 @@ describe('adjust_stock_and_price', () => {
         staffUser.client.rpc('adjust_stock_and_price', {
           p_product_id: product.id,
           p_stock_delta: -1,
-        })
-      )
+        }),
+      ),
     );
 
     for (const result of results) {
@@ -492,8 +482,8 @@ describe('adjust_stock_and_price', () => {
         staffUser.client.rpc('adjust_stock_and_price', {
           p_product_id: product.id,
           p_stock_delta: -1,
-        })
-      )
+        }),
+      ),
     );
 
     const { data: logs } = await admin
@@ -546,10 +536,7 @@ describe('denetim kaydının değiştirilemezliği', () => {
 
     await adminUser.client.from('stock_logs').delete().eq('product_id', product.id);
 
-    const { data: logs } = await admin
-      .from('stock_logs')
-      .select('id')
-      .eq('product_id', product.id);
+    const { data: logs } = await admin.from('stock_logs').select('id').eq('product_id', product.id);
 
     expect(logs).toHaveLength(1);
   });
@@ -571,10 +558,7 @@ describe('denetim kaydının değiştirilemezliği', () => {
 
 describe('inventory_stats görünümü', () => {
   test('ürün sayısı, toplam adet ve kritik stok bilgisini verir', async () => {
-    const { data, error } = await staffUser.client
-      .from('inventory_stats')
-      .select('*')
-      .single();
+    const { data, error } = await staffUser.client.from('inventory_stats').select('*').single();
 
     expect(error).toBeNull();
     expect(data).not.toBeNull();
@@ -595,7 +579,7 @@ describe('inventory_stats görünümü', () => {
     const after = await staffUser.client.from('inventory_stats').select('*').single();
 
     expect(Number(after.data?.out_of_stock_count)).toBe(
-      Number(before.data?.out_of_stock_count) + 1
+      Number(before.data?.out_of_stock_count) + 1,
     );
   });
 });

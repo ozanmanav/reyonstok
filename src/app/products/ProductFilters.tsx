@@ -51,10 +51,7 @@ export default function ProductFilters({
   }
 
   const hasAnyFilter =
-    initial.search !== '' ||
-    initial.shelf !== '' ||
-    initial.category !== '' ||
-    initial.lowStock;
+    initial.search !== '' || initial.shelf !== '' || initial.category !== '' || initial.lowStock;
 
   return (
     <div className="space-y-3 rounded-3xl border border-zinc-200 bg-white p-4 shadow-sm">
@@ -87,10 +84,7 @@ export default function ProductFilters({
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <label
-            htmlFor={`${fieldId}-shelf`}
-            className="block text-xs font-semibold text-zinc-700"
-          >
+          <label htmlFor={`${fieldId}-shelf`} className="block text-xs font-semibold text-zinc-700">
             Reyon
           </label>
           <select

@@ -1,21 +1,16 @@
 import type { Metadata } from 'next';
-import PrintLabelsScreen from './PrintLabelsScreen';
 import ProductFilters from '@/app/products/ProductFilters';
-import {
-  LABEL_BATCH_LIMIT,
-  buildLabelPayload,
-  siteUrlFromEnv,
-  siteUrlWarning,
-} from '@/lib/label';
+import { formatQuantity } from '@/lib/format';
+import { buildLabelPayload, LABEL_BATCH_LIMIT, siteUrlFromEnv, siteUrlWarning } from '@/lib/label';
 import { renderQrSvgMap } from '@/lib/qr';
 import {
+  type ProductFilters as Filters,
   getAllCategories,
   getAllProducts,
   getAllShelves,
-  type ProductFilters as Filters,
 } from '@/lib/repo/products';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { formatQuantity } from '@/lib/format';
+import PrintLabelsScreen from './PrintLabelsScreen';
 
 export const metadata: Metadata = {
   title: 'Etiket bas - ReyonStok',
@@ -61,12 +56,12 @@ export default async function PrintLabelsPage({ searchParams }: PageProps<'/prin
   const warning = siteUrlWarning(siteUrl);
 
   const payloadByCode = Object.fromEntries(
-    products.map((product) => [product.code, buildLabelPayload(product.code, siteUrl)])
+    products.map((product) => [product.code, buildLabelPayload(product.code, siteUrl)]),
   );
   const svgByPayload = await renderQrSvgMap(Object.values(payloadByCode));
 
   const qrByCode = Object.fromEntries(
-    Object.entries(payloadByCode).map(([code, payload]) => [code, svgByPayload[payload]])
+    Object.entries(payloadByCode).map(([code, payload]) => [code, svgByPayload[payload]]),
   );
 
   return (
@@ -74,8 +69,8 @@ export default async function PrintLabelsPage({ searchParams }: PageProps<'/prin
       <div className="print:hidden">
         <h1 className="text-2xl font-black tracking-tight text-zinc-900">Etiket bas</h1>
         <p className="mt-1 text-sm text-zinc-600">
-          Reyona yapıştırılacak karekodlu fiyat etiketlerini hazırlayın. Etiketi okutan
-          telefon doğrudan ürünün tarama sayfasını açar.
+          Reyona yapıştırılacak karekodlu fiyat etiketlerini hazırlayın. Etiketi okutan telefon
+          doğrudan ürünün tarama sayfasını açar.
         </p>
       </div>
 
@@ -93,9 +88,9 @@ export default async function PrintLabelsPage({ searchParams }: PageProps<'/prin
           role="status"
           className="rounded-2xl border border-zinc-300 bg-zinc-50 px-3.5 py-3 text-sm leading-relaxed text-zinc-700 print:hidden"
         >
-          Filtreye {formatQuantity(matched.length)} ürün veya daha fazlası uyuyor; tek seferde
-          en çok {formatQuantity(LABEL_BATCH_LIMIT)} etiket hazırlanıyor. Reyon filtresiyle
-          daraltıp parça parça basın.
+          Filtreye {formatQuantity(matched.length)} ürün veya daha fazlası uyuyor; tek seferde en
+          çok {formatQuantity(LABEL_BATCH_LIMIT)} etiket hazırlanıyor. Reyon filtresiyle daraltıp
+          parça parça basın.
         </p>
       ) : null}
 
@@ -118,11 +113,7 @@ export default async function PrintLabelsPage({ searchParams }: PageProps<'/prin
         kimliklerine dayandığı için, liste değişince eski seçim yanlış etiketlerin
         atlanmasına yol açardı.
       */}
-      <PrintLabelsScreen
-        key={filterKey(filters)}
-        products={products}
-        qrByCode={qrByCode}
-      />
+      <PrintLabelsScreen key={filterKey(filters)} products={products} qrByCode={qrByCode} />
     </div>
   );
 }

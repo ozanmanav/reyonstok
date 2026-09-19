@@ -50,7 +50,7 @@ function findChrome() {
 
   throw new Error(
     'Chrome/Chromium bulunamadı. İkonları yeniden üretmek için Chrome gerekiyor;\n' +
-      'PNG dosyaları depoda hazır olduğu için normal geliştirmede bu betik gerekmez.'
+      'PNG dosyaları depoda hazır olduğu için normal geliştirmede bu betik gerekmez.',
   );
 }
 
@@ -85,7 +85,7 @@ ${svg}`;
         `--screenshot=${resolve(output)}`,
         `file://${page}`,
       ],
-      { stdio: 'ignore' }
+      { stdio: 'ignore' },
     );
 
     console.log(`${output} (${size}x${size})`);

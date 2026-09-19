@@ -1,10 +1,11 @@
 // @vitest-environment node
-import { beforeAll, describe, expect, test } from 'vitest';
+
 import QRCode from 'qrcode';
+import { beforeAll, describe, expect, test } from 'vitest';
 import { buildLabelPayload } from '@/lib/label';
 import { QR_ENCODE_OPTIONS } from '@/lib/qr';
-import { createDetector } from '@/lib/scanner/detector';
 import { buildScanUrl, normalizeScan } from '@/lib/scan-code';
+import { createDetector } from '@/lib/scanner/detector';
 
 /**
  * WASM tabanlı yedek çözümleyicinin gerçekten kod okuduğunu doğrular.
@@ -35,7 +36,7 @@ beforeAll(() => {
       readonly x = 0,
       readonly y = 0,
       readonly width = 0,
-      readonly height = 0
+      readonly height = 0,
     ) {}
   };
 });
@@ -124,12 +125,10 @@ describe('WASM çözümleyici', () => {
     // Düz beyaz 1x1 PNG.
     const blank = Buffer.from(
       'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8AAAwAB/wFDAAAAAElFTkSuQmCC',
-      'base64'
+      'base64',
     );
 
-    const codes = await detector.detect(
-      new Blob([new Uint8Array(blank)], { type: 'image/png' })
-    );
+    const codes = await detector.detect(new Blob([new Uint8Array(blank)], { type: 'image/png' }));
 
     expect(codes).toEqual([]);
   });

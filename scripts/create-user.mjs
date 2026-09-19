@@ -50,7 +50,7 @@ const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!url || !serviceRoleKey) {
   console.error(
-    'NEXT_PUBLIC_SUPABASE_URL ve SUPABASE_SERVICE_ROLE_KEY gerekli. `vercel env pull .env.local` çalıştırın.'
+    'NEXT_PUBLIC_SUPABASE_URL ve SUPABASE_SERVICE_ROLE_KEY gerekli. `vercel env pull .env.local` çalıştırın.',
   );
   process.exit(1);
 }

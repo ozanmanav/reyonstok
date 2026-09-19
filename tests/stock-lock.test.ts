@@ -1,6 +1,7 @@
 // @vitest-environment node
-import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+
 import type { Client } from 'pg';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { connectDb, wait } from './helpers/db';
 import { createAdminClient, deleteProducts, uniqueProductCode } from './helpers/supabase';
 
@@ -79,15 +80,14 @@ describe('adjust_stock_and_price satır kilidi', () => {
       });
 
     await wait(600);
-    expect(
-      finished,
-      'Fonksiyon satır kilidini beklemedi; `for update` kaldırılmış olabilir'
-    ).toBe(false);
+    expect(finished, 'Fonksiyon satır kilidini beklemedi; `for update` kaldırılmış olabilir').toBe(
+      false,
+    );
 
     // 3. A stoğu düşürüp işlemi tamamlar: 20 -> 19.
     await sessionA.query(
       'update public.products set stock_quantity = stock_quantity - 1 where id = $1',
-      [productId]
+      [productId],
     );
     await sessionA.query('commit');
 
@@ -123,10 +123,9 @@ describe('adjust_stock_and_price satır kilidi', () => {
     await sessionA.query('begin');
     await sessionA.query('select * from public.products where id = $1 for update', [productId]);
 
-    const pending = sessionB.query(
-      'select public.adjust_stock_and_price($1, null, 4) as product',
-      [productId]
-    );
+    const pending = sessionB.query('select public.adjust_stock_and_price($1, null, 4) as product', [
+      productId,
+    ]);
 
     await wait(400);
 

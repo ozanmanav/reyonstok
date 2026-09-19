@@ -19,7 +19,7 @@ function productBody(overrides: Record<string, unknown> = {}) {
 describe('createProductSchema', () => {
   test('geçerli gövdeyi kabul eder ve boşlukları kırpar', () => {
     const result = createProductSchema.parse(
-      productBody({ name: '  Çekiç  ', shelf_location: ' Reyon A ' })
+      productBody({ name: '  Çekiç  ', shelf_location: ' Reyon A ' }),
     );
 
     expect(result.name).toBe('Çekiç');
@@ -79,9 +79,9 @@ describe('createProductSchema', () => {
   });
 
   test('geçerli EAN-13 barkodu kabul edilir', () => {
-    expect(
-      createProductSchema.safeParse(productBody({ barcode: '4006381333931' })).success
-    ).toBe(true);
+    expect(createProductSchema.safeParse(productBody({ barcode: '4006381333931' })).success).toBe(
+      true,
+    );
   });
 
   test('kontrol hanesi hatalı EAN-13 reddedilir', () => {
@@ -95,10 +95,10 @@ describe('createProductSchema', () => {
     // Mağazada UPC-A (12 hane), EAN-8 ve Code-128 etiketli ürünler olabilir.
     expect(createProductSchema.safeParse(productBody({ barcode: '96385074' })).success).toBe(true);
     expect(createProductSchema.safeParse(productBody({ barcode: '012345678905' })).success).toBe(
-      true
+      true,
     );
     expect(createProductSchema.safeParse(productBody({ barcode: 'ABC-123-XYZ' })).success).toBe(
-      true
+      true,
     );
   });
 
@@ -109,10 +109,10 @@ describe('createProductSchema', () => {
 
   test('aşırı uzun metinler reddedilir', () => {
     expect(createProductSchema.safeParse(productBody({ name: 'a'.repeat(201) })).success).toBe(
-      false
+      false,
     );
     expect(
-      createProductSchema.safeParse(productBody({ shelf_location: 'a'.repeat(121) })).success
+      createProductSchema.safeParse(productBody({ shelf_location: 'a'.repeat(121) })).success,
     ).toBe(false);
   });
 });

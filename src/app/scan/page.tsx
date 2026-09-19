@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import ScanScreen, { type InitialLookup } from './ScanScreen';
 import { getCurrentUser, WRITE_ROLES } from '@/lib/auth';
 import { getProductByCode } from '@/lib/repo/products';
 import { getStockLogsForProduct } from '@/lib/repo/stock-logs';
 import { normalizeScan } from '@/lib/scan-code';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import ScanScreen, { type InitialLookup } from './ScanScreen';
 
 export const metadata: Metadata = {
   title: 'Tara - ReyonStok',
@@ -32,19 +32,13 @@ export default async function ScanPage({ searchParams }: PageProps<'/scan'>) {
 
   const initialLookup = rawCode ? await lookupInitialCode(supabase, rawCode) : undefined;
 
-  return (
-    <ScanScreen
-      initialCode={rawCode}
-      initialLookup={initialLookup}
-      canWrite={canWrite}
-    />
-  );
+  return <ScanScreen initialCode={rawCode} initialLookup={initialLookup} canWrite={canWrite} />;
 }
 
 /** Adresle gelen kodu sunucuda çözüp ürünü ve hareketlerini hazırlar. */
 async function lookupInitialCode(
   supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
-  rawCode: string
+  rawCode: string,
 ): Promise<InitialLookup | undefined> {
   const scan = normalizeScan(rawCode);
   if (scan.code === '') {

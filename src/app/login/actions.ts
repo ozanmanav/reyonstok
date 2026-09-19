@@ -41,7 +41,7 @@ function safeRedirectTarget(value: string | null): string {
 
 export async function signInAction(
   _previousState: LoginState,
-  formData: FormData
+  formData: FormData,
 ): Promise<LoginState> {
   const parsed = credentialsSchema.safeParse({
     email: formData.get('email'),

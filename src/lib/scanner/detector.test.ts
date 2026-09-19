@@ -1,9 +1,9 @@
 import { describe, expect, test, vi } from 'vitest';
 import {
+  type BarcodeDetectorConstructor,
   createDetector,
   nativeSupportsRequiredFormats,
   SCANNER_FORMATS,
-  type BarcodeDetectorConstructor,
 } from './detector';
 
 /**

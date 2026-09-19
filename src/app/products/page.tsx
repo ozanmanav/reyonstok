@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import ProductFilters from './ProductFilters';
 import { getCurrentUser, WRITE_ROLES } from '@/lib/auth';
 import { formatCurrency, formatQuantity } from '@/lib/format';
 import {
+  type ProductFilters as Filters,
   getAllCategories,
   getAllProducts,
   getAllShelves,
-  type ProductFilters as Filters,
 } from '@/lib/repo/products';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import ProductFilters from './ProductFilters';
 
 export const metadata: Metadata = {
   title: 'Ürünler - ReyonStok',

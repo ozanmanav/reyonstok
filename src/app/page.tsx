@@ -91,7 +91,7 @@ export default async function DashboardPage() {
             label="Kritik stok"
             value={formatQuantity(criticalCount)}
             hint={`${formatQuantity(stats.out_of_stock_count)} tükendi, ${formatQuantity(
-              stats.low_stock_count
+              stats.low_stock_count,
             )} azaldı`}
             tone={criticalCount > 0 ? 'warning' : undefined}
             href="/products?lowStock=true"
@@ -114,9 +114,7 @@ export default async function DashboardPage() {
           </div>
 
           {shelves.length === 0 ? (
-            <p className="py-4 text-center text-xs text-zinc-500">
-              Henüz reyon tanımlanmadı.
-            </p>
+            <p className="py-4 text-center text-xs text-zinc-500">Henüz reyon tanımlanmadı.</p>
           ) : (
             <ul className="max-h-72 space-y-1.5 overflow-y-auto pr-1">
               {shelves.map((shelf) => (
@@ -179,16 +177,12 @@ function StatCard({
     tone === 'money' ? 'text-emerald-700' : tone === 'warning' ? 'text-amber-600' : 'text-zinc-900';
 
   const surface =
-    tone === 'warning'
-      ? 'border-amber-200 bg-amber-50/70'
-      : 'border-zinc-200 bg-white';
+    tone === 'warning' ? 'border-amber-200 bg-amber-50/70' : 'border-zinc-200 bg-white';
 
   const content = (
     <>
       <p className="text-xs font-bold uppercase tracking-wider text-zinc-500">{label}</p>
-      <p className={`mt-2 text-2xl font-black tracking-tight sm:text-3xl ${valueColor}`}>
-        {value}
-      </p>
+      <p className={`mt-2 text-2xl font-black tracking-tight sm:text-3xl ${valueColor}`}>{value}</p>
       <p className="mt-0.5 text-[11px] font-medium text-zinc-500">{hint}</p>
     </>
   );

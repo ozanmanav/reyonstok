@@ -37,8 +37,11 @@ async function readHiddenFields(): Promise<{ name: string; value: string }[]> {
     ([, name, value = '']) => ({
       name,
       // HTML öznitelik kaçışlarını geri çevir.
-      value: value.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&#x27;/g, "'"),
-    })
+      value: value
+        .replace(/&quot;/g, '"')
+        .replace(/&amp;/g, '&')
+        .replace(/&#x27;/g, "'"),
+    }),
   );
 }
 

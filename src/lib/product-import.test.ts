@@ -150,7 +150,7 @@ describe('parseImportRows', () => {
       [
         'Ürün Kodu;Barkod;Ürün Adı;Kategori;Reyon;Alış Fiyatı;Satış Fiyatı;Stok;Kritik Stok;Birim;Notlar',
         'ENV-2001;8690000000012;Klasik Çekiç;El Aletleri;Reyon A - Raf 1;180,00;290,00;14;4;Adet;Ahşap saplı',
-      ].join('\n')
+      ].join('\n'),
     );
 
     expect(result.errors).toEqual([]);
@@ -211,12 +211,7 @@ describe('parseImportRows', () => {
     // Mağaza dosyasında tek bozuk satır yüzünden hiçbir ürün aktarılmaması
     // kabul edilebilir değil.
     const result = importCsv(
-      [
-        'Ürün Adı;Reyon;Fiyat',
-        'Çekiç;Reyon A;290',
-        ';Reyon A;10',
-        'İğne;Reyon B;12,75',
-      ].join('\n')
+      ['Ürün Adı;Reyon;Fiyat', 'Çekiç;Reyon A;290', ';Reyon A;10', 'İğne;Reyon B;12,75'].join('\n'),
     );
 
     expect(result.products.map((product) => product.name)).toEqual(['Çekiç', 'İğne']);
@@ -236,16 +231,14 @@ describe('parseImportRows', () => {
   });
 
   test('ondalıklı stok adedini reddeder', () => {
-    const result = importCsv(
-      ['Ürün Adı;Reyon;Fiyat;Stok', 'Çekiç;Reyon A;290;3,5'].join('\n')
-    );
+    const result = importCsv(['Ürün Adı;Reyon;Fiyat;Stok', 'Çekiç;Reyon A;290;3,5'].join('\n'));
 
     expect(result.errors[0]?.messages[0]).toContain('Stok adedi geçersiz');
   });
 
   test('kontrol hanesi hatalı EAN-13 barkodu reddeder', () => {
     const result = importCsv(
-      ['Ürün Adı;Reyon;Fiyat;Barkod', 'Çekiç;Reyon A;290;4006381333932'].join('\n')
+      ['Ürün Adı;Reyon;Fiyat;Barkod', 'Çekiç;Reyon A;290;4006381333932'].join('\n'),
     );
 
     expect(result.errors[0]?.messages[0]).toContain('EAN-13 kontrol hanesi hatalı');
@@ -253,7 +246,7 @@ describe('parseImportRows', () => {
 
   test('EAN-13 dışındaki barkod biçimlerini kabul eder', () => {
     const result = importCsv(
-      ['Ürün Adı;Reyon;Fiyat;Barkod', 'Çekiç;Reyon A;290;96385074'].join('\n')
+      ['Ürün Adı;Reyon;Fiyat;Barkod', 'Çekiç;Reyon A;290;96385074'].join('\n'),
     );
 
     expect(result.errors).toEqual([]);
@@ -263,11 +256,9 @@ describe('parseImportRows', () => {
   test('dosya içinde yinelenen ürün kodunu yakalar', () => {
     // Veritabanına gitmeden yakalanmalı; yoksa ikinci satır birinciyi eziyor.
     const result = importCsv(
-      [
-        'Kod;Ürün Adı;Reyon;Fiyat',
-        'ENV-3001;Çekiç;Reyon A;290',
-        'ENV-3001;İğne;Reyon B;12',
-      ].join('\n')
+      ['Kod;Ürün Adı;Reyon;Fiyat', 'ENV-3001;Çekiç;Reyon A;290', 'ENV-3001;İğne;Reyon B;12'].join(
+        '\n',
+      ),
     );
 
     expect(result.products).toHaveLength(1);
@@ -280,7 +271,7 @@ describe('parseImportRows', () => {
         'Barkod;Ürün Adı;Reyon;Fiyat',
         '8690000000012;Çekiç;Reyon A;290',
         '8690000000012;İğne;Reyon B;12',
-      ].join('\n')
+      ].join('\n'),
     );
 
     expect(result.products).toHaveLength(1);
@@ -289,11 +280,9 @@ describe('parseImportRows', () => {
 
   test('aynı kod büyük/küçük harfle yazılsa da yinelenme sayılır', () => {
     const result = importCsv(
-      [
-        'Kod;Ürün Adı;Reyon;Fiyat',
-        'env-3002;Çekiç;Reyon A;290',
-        'ENV-3002;İğne;Reyon B;12',
-      ].join('\n')
+      ['Kod;Ürün Adı;Reyon;Fiyat', 'env-3002;Çekiç;Reyon A;290', 'ENV-3002;İğne;Reyon B;12'].join(
+        '\n',
+      ),
     );
 
     expect(result.errors).toHaveLength(1);
@@ -314,7 +303,7 @@ describe('parseImportRows', () => {
 
   test('tırnaklı ve virgüllü alanları doğru çözer', () => {
     const result = importCsv(
-      ['Ürün Adı;Reyon;Fiyat;Notlar', '"Çekiç, büyük";Reyon A;1.290,50;"Ağır, sağlam"'].join('\n')
+      ['Ürün Adı;Reyon;Fiyat;Notlar', '"Çekiç, büyük";Reyon A;1.290,50;"Ağır, sağlam"'].join('\n'),
     );
 
     expect(result.errors).toEqual([]);
@@ -327,7 +316,7 @@ describe('parseImportRows', () => {
 
   test('sıfır fiyat ve sıfır stok geçerli', () => {
     const result = importCsv(
-      ['Ürün Adı;Reyon;Fiyat;Stok', 'Promosyon Ürünü;Reyon A;0;0'].join('\n')
+      ['Ürün Adı;Reyon;Fiyat;Stok', 'Promosyon Ürünü;Reyon A;0;0'].join('\n'),
     );
 
     expect(result.errors).toEqual([]);

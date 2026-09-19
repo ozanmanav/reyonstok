@@ -1,38 +1,38 @@
-import type { Metadata, Viewport } from "next";
-import "./globals.css";
-import Navbar from "@/components/Navbar";
-import { getCurrentUser } from "@/lib/auth";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { Metadata, Viewport } from 'next';
+import './globals.css';
+import Navbar from '@/components/Navbar';
+import { getCurrentUser } from '@/lib/auth';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
-  title: "ReyonStok - Mağaza Karekod, Fiyat ve Stok Takibi",
+  title: 'ReyonStok - Mağaza Karekod, Fiyat ve Stok Takibi',
   description:
-    "Mağaza reyonlarındaki karekodları telefonla okutup ürünün fiyatını, stoğunu ve bilgisini gören, stok düzeltmesi yapan mobil uygulama.",
-  applicationName: "ReyonStok",
+    'Mağaza reyonlarındaki karekodları telefonla okutup ürünün fiyatını, stoğunu ve bilgisini gören, stok düzeltmesi yapan mobil uygulama.',
+  applicationName: 'ReyonStok',
   // iOS, manifest'teki display: standalone ayarını tek başına yeterli
   // görmüyor; ana ekrana eklenen uygulamanın tarayıcı çubuğu olmadan açılması
   // için bu meta etiketleri gerekiyor.
   appleWebApp: {
     capable: true,
-    title: "ReyonStok",
+    title: 'ReyonStok',
     // 'black-translucent' içeriği durum çubuğunun ALTINA kaydırıyor. Gezinme
     // çubuğunda güvenli alan dolgusu var ama giriş sayfasında çubuk yok; saat
     // ve pil simgesi e-posta alanının üstüne binerdi.
-    statusBarStyle: "default",
+    statusBarStyle: 'default',
   },
   // Uygulama yalnızca oturumla kullanılıyor, arama sonuçlarında yeri yok.
   robots: { index: false, follow: false },
 };
 
 export const viewport: Viewport = {
-  width: "device-width",
+  width: 'device-width',
   initialScale: 1,
   // Ana ekrana eklendiğinde çentikli ekranlarda tam genişlik kullanılsın
-  viewportFit: "cover",
-  themeColor: "#18181b",
+  viewportFit: 'cover',
+  themeColor: '#18181b',
 };
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<'/'>) {
   // Oturum bilgisi gezinme çubuğu için gerekli. Giriş sayfasında kullanıcı
   // olmadığı için çubuk gizlenir.
   const supabase = await createSupabaseServerClient();

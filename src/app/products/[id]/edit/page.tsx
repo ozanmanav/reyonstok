@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import DeleteProductButton from './DeleteProductButton';
 import ProductForm, { type ProductFormValues } from '@/components/ProductForm';
 import { ADMIN_ROLES, getCurrentUser, WRITE_ROLES } from '@/lib/auth';
-import { buildScanUrl } from '@/lib/scan-code';
 import { getProductById } from '@/lib/repo/products';
+import { buildScanUrl } from '@/lib/scan-code';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import DeleteProductButton from './DeleteProductButton';
 
 export const metadata: Metadata = {
   title: 'Ürünü düzenle - ReyonStok',

@@ -56,6 +56,20 @@ Testler tek bir bulut Supabase projesini paylaştığı için sırayla koşar
 (`fileParallelism: false`). Elle başlatılmış bir `npm run dev` açıkken
 `npm test` çalıştırmayın; ikisi aynı `.next` dizini için çekişir.
 
+### Sürüm tavanı
+
+Bağımlılıklar tam sürümle sabitlenmiştir. İkisi bilinçli olarak en son
+sürümde DEĞİL, çünkü Next.js'in lint zinciri henüz desteklemiyor:
+
+| Paket | Kullanılan | Son sürüm | Engel |
+| --- | --- | --- | --- |
+| `eslint` | 9.39.5 | 10.11.0 | `eslint-plugin-react` (eslint-config-next içinden) ESLint 10'da kaldırılan `context.getFilename()`'i çağırıyor; peer aralığı `^9.7`'de bitiyor ve düzeltilmiş bir sürümü yok |
+| `typescript` | 6.0.3 | 7.0.2 | `typescript-eslint` TS 7'yi açıkça reddediyor ([takip](https://github.com/typescript-eslint/typescript-eslint/issues/10940)). TS 6.0.3, zincirin desteklediği en yeni sürüm (`>=4.8.4 <6.1.0`) |
+
+İkisini zorlamak lint'i tamamen devre dışı bırakmak anlamına geliyor; bu projede
+`react-hooks` kuralları gerçek hatalar yakaladığı için o takas kabul edilmedi.
+Engeller kalktığında yükseltilmeli.
+
 ## Roller
 
 | Rol | Yetki |

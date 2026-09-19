@@ -19,6 +19,7 @@ tek dokunuşla stok/fiyat düzeltmesi yapan mobil web uygulaması (PWA).
 | Veritabanı | Supabase Postgres + satır düzeyi güvenlik (RLS) |
 | Kimlik | Supabase Auth, httpOnly çerezle sunucu tarafı oturum |
 | Barkod | `barcode-detector` — yerleşik `BarcodeDetector`, yoksa ZXing WASM |
+| Lint + biçim | Biome (ESLint'in yerini aldı) |
 | Test | Vitest, gerçek Supabase projesine ve gerçek dev sunucusuna karşı |
 | Barındırma | Vercel (`iad1`), Supabase Vercel Marketplace entegrasyonuyla |
 
@@ -47,7 +48,9 @@ node scripts/create-user.mjs eposta@ornek.com "guclu-bir-sifre" admin "Ad Soyad"
 | `npm run dev` | Geliştirme sunucusu (WASM dosyasını da kopyalar) |
 | `npm test` | Tüm testler (~2 dk, gerçek veritabanına bağlanır) |
 | `npm run typecheck` | `next typegen` + `tsc --noEmit` |
-| `npm run lint` | ESLint |
+| `npm run lint` | Biome: lint + biçim denetimi + import sıralaması |
+| `npm run lint:fix` | Düzeltilebilenleri uygular |
+| `npm run format` | Yalnızca biçimlendirir |
 | `npm run build` | Üretim derlemesi |
 | `node scripts/smoke-test.mjs <adres> <eposta> <sifre>` | Yayındaki sürümü denetler |
 | `node scripts/generate-icons.mjs` | PWA ikonlarını SVG'den yeniden üretir (Chrome gerekir) |
@@ -56,19 +59,50 @@ Testler tek bir bulut Supabase projesini paylaştığı için sırayla koşar
 (`fileParallelism: false`). Elle başlatılmış bir `npm run dev` açıkken
 `npm test` çalıştırmayın; ikisi aynı `.next` dizini için çekişir.
 
-### Sürüm tavanı
+## Lint ve biçim: neden Biome
 
-Bağımlılıklar tam sürümle sabitlenmiştir. İkisi bilinçli olarak en son
-sürümde DEĞİL, çünkü Next.js'in lint zinciri henüz desteklemiyor:
+ESLint ve `eslint-config-next` kaldırıldı, yerine Biome geldi.
 
-| Paket | Kullanılan | Son sürüm | Engel |
-| --- | --- | --- | --- |
-| `eslint` | 9.39.5 | 10.11.0 | `eslint-plugin-react` (eslint-config-next içinden) ESLint 10'da kaldırılan `context.getFilename()`'i çağırıyor; peer aralığı `^9.7`'de bitiyor ve düzeltilmiş bir sürümü yok |
-| `typescript` | 6.0.3 | 7.0.2 | `typescript-eslint` TS 7'yi açıkça reddediyor ([takip](https://github.com/typescript-eslint/typescript-eslint/issues/10940)). TS 6.0.3, zincirin desteklediği en yeni sürüm (`>=4.8.4 <6.1.0`) |
+Asıl gerekçe sürüm tıkanıklığıydı. `eslint-config-next` iki bağımlılığı
+taşıyordu ve ikisi de yükseltmeleri kilitliyordu: `eslint-plugin-react` ESLint
+10'da kaldırılan bir API'yi çağırıp lint'i çökertiyordu, `typescript-eslint` ise
+TypeScript 7'yi açıkça reddediyordu. Biome kendi çözümleyicisini kullandığı için
+TypeScript sürümünden bağımsız; geçişle birlikte **TypeScript 7'ye çıkıldı** ve
+derlemedeki tip denetimi 1988 ms'den 379 ms'ye düştü. Bağımlılık sayısı da
+521'den 216 pakete indi.
 
-İkisini zorlamak lint'i tamamen devre dışı bırakmak anlamına geliyor; bu projede
-`react-hooks` kuralları gerçek hatalar yakaladığı için o takas kabul edilmedi.
-Engeller kalktığında yükseltilmeli.
+Biome yapılandırması `biome.jsonc` içinde, her karar gerekçesiyle yazılı.
+Etkinleştirilen alanlar (domains): `next`, `react`, `test`.
+
+Geçiş sırasında Biome'un yakaladığı ve **ESLint'in kaçırdığı** gerçek hatalar:
+
+- `ProductQuickCard` içinde fiyat ve stok değerleri `<p aria-labelledby=...>`
+  ile etiketlerine bağlanmıştı. Bu sessizce etkisizdi: paragraph rolü
+  erişilebilir ad kabul etmiyor, ekran okuyucu bağlantıyı yok sayıyordu.
+  Testler geçiyordu çünkü testing-library adı kendi hesaplıyor. `dt`/`dd`
+  ile yeniden yazıldı, ARIA'ya gerek kalmadı.
+- Kamera önizlemesi `aria-hidden="true"` idi ama odaklanabilirdi — klavyeyle
+  gezinen kullanıcı, ekran okuyucunun görmediği bir yere düşüyordu.
+- `forEach` içinde değer döndüren kısa ok fonksiyonları (`map` demek istendiği
+  şüphesi).
+
+Güvenlik ağının gerçekten devrede olduğu mutasyon testiyle doğrulandı: koşullu
+hook çağrısı `useHookAtTopLevel`, eksik bağımlılık `useExhaustiveDependencies`
+tarafından yakalanıyor.
+
+### Bilinen boşluklar
+
+| ESLint'te olan | Biome durumu |
+| --- | --- |
+| `@next/next/no-html-link-for-pages` | Karşılığı yok; `<Link>` yerine `<a href="/x">` yazılırsa uyarı gelmez |
+| `@next/next/no-assign-module-variable` | Karşılığı yok |
+| `react-hooks/set-state-in-effect` | En yakını `nursery/useReactCompiler`, KAPALI |
+
+`useReactCompiler` denendi ve kapalı bırakıldı: kural henüz kararsız (nursery) ve
+tek bulgusu `BarcodeScanner` içindeki kare okuma döngüsünün karşılıklı
+özyinelemesi. O döngüdeki değişken durum tamamen ref'lerde tutulduğu için
+bayatlama riski yok; kural bunu kanıtlayamıyor. Kararsız bir kuralı, ancak gerçek
+cihazda doğrulanabilecek bir döngü için kapı bekçisi yapmak doğru bulunmadı.
 
 ## Roller
 

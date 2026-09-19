@@ -66,7 +66,11 @@ async function sessionCookie() {
   const client = createServerClient(supabaseUrl, anonKey, {
     cookies: {
       getAll: () => [...jar].map(([name, value]) => ({ name, value })),
-      setAll: (list) => list.forEach(({ name, value }) => jar.set(name, value)),
+      setAll: (list) => {
+        for (const { name, value } of list) {
+          jar.set(name, value);
+        }
+      },
     },
   });
 
@@ -109,10 +113,7 @@ await check('korumalı sayfa giriş sayfasına yönlendiriyor', async () => {
 await check('API oturumsuz 401 JSON döndürüyor', async () => {
   const response = await get('/api/products');
   assert(response.status === 401, `HTTP ${response.status}`);
-  assert(
-    (response.headers.get('content-type') ?? '').includes('application/json'),
-    'JSON değil'
-  );
+  assert((response.headers.get('content-type') ?? '').includes('application/json'), 'JSON değil');
 
   return 'HTTP 401';
 });
@@ -151,8 +152,7 @@ await check('barkod okuyucunun WASM dosyası sunuluyor', async () => {
   // WebAssembly ikili başlığı: 0x00 'a' 's' 'm'. Yanlış yapılandırmada bu yol
   // HTML giriş sayfası döndürebiliyor ve hata ancak telefonda tarama
   // denendiğinde ortaya çıkıyor.
-  const isWasm =
-    bytes[0] === 0x00 && bytes[1] === 0x61 && bytes[2] === 0x73 && bytes[3] === 0x6d;
+  const isWasm = bytes[0] === 0x00 && bytes[1] === 0x61 && bytes[2] === 0x73 && bytes[3] === 0x6d;
   assert(isWasm, 'gelen içerik WebAssembly değil');
 
   return `${Math.round(bytes.byteLength / 1024)} KB, geçerli WASM başlığı`;

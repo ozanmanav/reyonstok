@@ -5,13 +5,13 @@ import { useState } from 'react';
 import { parseCsv } from '@/lib/csv';
 import { formatQuantity } from '@/lib/format';
 import {
+  type ColumnMapping,
   detectColumnMapping,
   FIELD_LABELS,
-  missingRequiredFields,
-  parseImportRows,
-  type ColumnMapping,
   type ImportedProduct,
   type ImportField,
+  missingRequiredFields,
+  parseImportRows,
   type RowError,
 } from '@/lib/product-import';
 
@@ -197,8 +197,8 @@ export default function ImportScreen() {
             <h2 className="text-sm font-black text-zinc-900">CSV dosyası seçin</h2>
             <p className="mt-1 text-xs leading-relaxed text-zinc-600">
               Excel&apos;den &quot;CSV olarak kaydet&quot; ile çıkardığınız dosyayı
-              yükleyebilirsiniz. Noktalı virgül veya virgül ayırıcı, Türkçe karakterler ve
-              virgüllü fiyatlar desteklenir.
+              yükleyebilirsiniz. Noktalı virgül veya virgül ayırıcı, Türkçe karakterler ve virgüllü
+              fiyatlar desteklenir.
             </p>
           </div>
 
@@ -240,8 +240,7 @@ export default function ImportScreen() {
             </div>
 
             <p className="text-xs leading-relaxed text-zinc-600">
-              Kolonlar başlık adlarına göre otomatik eşleştirildi. Yanlış eşleşme varsa
-              düzeltin.
+              Kolonlar başlık adlarına göre otomatik eşleştirildi. Yanlış eşleşme varsa düzeltin.
             </p>
 
             <div className="grid gap-2 sm:grid-cols-2">
@@ -261,6 +260,15 @@ export default function ImportScreen() {
                   >
                     <option value="">Eşleştirilmedi</option>
                     {preview.rows[0].map((header, index) => (
+                      /*
+                        Kolonun kimliği zaten konumu: `value={index}` eşleştirmede
+                        kullanılan değerin kendisi. Liste sıralanmıyor,
+                        filtrelenmiyor, araya ekleme yapılmıyor; dosya
+                        değiştiğinde önizlemenin tamamı baştan kuruluyor. Başlık
+                        adı tek başına anahtar olamaz, CSV'de aynı başlık iki
+                        kolonda geçebiliyor.
+                      */
+                      // biome-ignore lint/suspicious/noArrayIndexKey: kolonun kimliği konumudur, liste hiç yeniden sıralanmıyor (bkz. üstteki not)
                       <option key={`${header}-${index}`} value={index}>
                         {header || `Kolon ${index + 1}`}
                       </option>
@@ -314,7 +322,18 @@ export default function ImportScreen() {
                   </thead>
                   <tbody>
                     {preview.products.slice(0, 5).map((product, index) => (
-                      <tr key={`${product.code ?? product.name}-${index}`} className="border-t border-zinc-100">
+                      /*
+                        Salt okunur önizleme tablosu. Satırlar sıralanmıyor,
+                        silinmiyor, araya eklenmiyor; dosya değiştiğinde liste
+                        baştan kuruluyor. Kod tek başına anahtar olamaz: içe
+                        aktarılan satırların kodu boş olabiliyor (sunucu atıyor)
+                        ve ad yinelenebiliyor.
+                      */
+                      <tr
+                        // biome-ignore lint/suspicious/noArrayIndexKey: salt okunur önizleme, satırlar hiç yeniden sıralanmıyor (bkz. üstteki not)
+                        key={`${product.code ?? product.name}-${index}`}
+                        className="border-t border-zinc-100"
+                      >
                         <td className="py-1.5 pr-3 font-mono">{product.code ?? 'otomatik'}</td>
                         <td className="py-1.5 pr-3">{product.name}</td>
                         <td className="py-1.5 pr-3">{product.shelf_location}</td>
@@ -325,9 +344,7 @@ export default function ImportScreen() {
                   </tbody>
                 </table>
                 {preview.products.length > 5 ? (
-                  <p className="mt-1 text-xs text-zinc-500">
-                    İlk 5 satır gösteriliyor.
-                  </p>
+                  <p className="mt-1 text-xs text-zinc-500">İlk 5 satır gösteriliyor.</p>
                 ) : null}
               </div>
             ) : null}
@@ -359,17 +376,13 @@ export default function ImportScreen() {
   );
 }
 
-function Stat({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: number;
-  tone?: 'good' | 'bad';
-}) {
+function Stat({ label, value, tone }: { label: string; value: number; tone?: 'good' | 'bad' }) {
   const color =
-    tone === 'good' ? 'text-emerald-700' : tone === 'bad' && value > 0 ? 'text-rose-700' : 'text-zinc-900';
+    tone === 'good'
+      ? 'text-emerald-700'
+      : tone === 'bad' && value > 0
+        ? 'text-rose-700'
+        : 'text-zinc-900';
 
   return (
     <div className="rounded-xl bg-zinc-50 px-2 py-2.5">
@@ -378,5 +391,3 @@ function Stat({
     </div>
   );
 }
-
-

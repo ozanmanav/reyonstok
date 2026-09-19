@@ -26,10 +26,17 @@ export default function QrBadge({
   className?: string;
 }) {
   return (
+    /*
+      SVG, src/lib/qr.ts içinde `qrcode` paketi tarafından üretiliyor ve yalnızca
+      yol (path) verisi içeriyor; karekodun taşıdığı metin çıktıya METİN olarak
+      girmiyor. src/lib/qr.test.ts bunu doğruluyor (<script, <text ve alan adı
+      aranıyor), yani kullanıcı verisinin işaretlemeye sızacağı bir yol yok.
+    */
     <span
       role="img"
       aria-label={label}
       className={`block [&>svg]:block [&>svg]:h-full [&>svg]:w-full ${className}`}
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: içerik kullanıcı verisi değil, qrcode paketinin ürettiği yol verisi (bkz. üstteki not ve src/lib/qr.test.ts)
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   );

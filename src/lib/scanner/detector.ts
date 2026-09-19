@@ -90,7 +90,7 @@ const LOCAL_WASM_PATH = '/zxing/';
  * barkodlar, yavaş ama çalışan bir çözümden kötüdür.
  */
 export async function nativeSupportsRequiredFormats(
-  native: BarcodeDetectorConstructor | undefined
+  native: BarcodeDetectorConstructor | undefined,
 ): Promise<boolean> {
   if (!native?.getSupportedFormats) {
     return false;
@@ -113,8 +113,7 @@ export async function nativeSupportsRequiredFormats(
  */
 export async function createDetector(deps: CreateDetectorDeps = {}): Promise<ScannerDetector> {
   const native =
-    deps.native ??
-    (globalThis as { BarcodeDetector?: BarcodeDetectorConstructor }).BarcodeDetector;
+    deps.native ?? (globalThis as { BarcodeDetector?: BarcodeDetectorConstructor }).BarcodeDetector;
 
   const loadPonyfill =
     deps.loadPonyfill ??
@@ -132,8 +131,12 @@ export async function createDetector(deps: CreateDetectorDeps = {}): Promise<Sca
       return ponyfillModule.BarcodeDetector as unknown as BarcodeDetectorConstructor;
     });
 
-  if (await nativeSupportsRequiredFormats(native)) {
-    return buildDetector(native!, 'native');
+  // `native &&` kontrolü mantıksal olarak gereksiz (nativeSupportsRequiredFormats
+  // tanımsız girdide false döner) ama TypeScript bunu asenkron bir çağrıdan
+  // çıkaramıyor. Açık kontrol, non-null assertion (`native!`) yazmaktan iyi:
+  // varsayımı derleyiciye kanıtlıyor, ona dayatmıyor.
+  if (native && (await nativeSupportsRequiredFormats(native))) {
+    return buildDetector(native, 'native');
   }
 
   const ponyfill = await loadPonyfill();
@@ -143,7 +146,7 @@ export async function createDetector(deps: CreateDetectorDeps = {}): Promise<Sca
 
 function buildDetector(
   Constructor: BarcodeDetectorConstructor,
-  source: DetectorSource
+  source: DetectorSource,
 ): ScannerDetector {
   // Biçim listesini daraltmak hem hızlandırıyor hem yanlış eşleşmeleri azaltıyor.
   const detector = new Constructor({ formats: [...SCANNER_FORMATS] });

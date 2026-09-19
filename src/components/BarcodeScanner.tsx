@@ -1,8 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { createDetector, type ScannerDetector } from '@/lib/scanner/detector';
 import { normalizeScan, type ScanResult } from '@/lib/scan-code';
+import { createDetector, type ScannerDetector } from '@/lib/scanner/detector';
 import { playBeep, vibrate } from '@/lib/sound';
 
 /**
@@ -75,7 +75,7 @@ export default function BarcodeScanner({ onScan, paused = false }: BarcodeScanne
       vibrate();
       onScan(result);
     },
-    [onScan]
+    [onScan],
   );
 
   /**
@@ -93,7 +93,9 @@ export default function BarcodeScanner({ onScan, paused = false }: BarcodeScanne
       timeoutRef.current = null;
     }
 
-    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current?.getTracks().forEach((track) => {
+      track.stop();
+    });
     streamRef.current = null;
   }, []);
 
@@ -186,7 +188,9 @@ export default function BarcodeScanner({ onScan, paused = false }: BarcodeScanne
 
       const video = videoRef.current;
       if (!video) {
-        stream.getTracks().forEach((track) => track.stop());
+        stream.getTracks().forEach((track) => {
+          track.stop();
+        });
 
         return;
       }
@@ -323,6 +327,10 @@ export default function BarcodeScanner({ onScan, paused = false }: BarcodeScanne
             className="h-full w-full object-cover"
             // Erişilebilirlik: canlı kamera görüntüsü dekoratif, bilgi metinle veriliyor.
             aria-hidden="true"
+            // aria-hidden ile birlikte ZORUNLU: odaklanabilen ama ekran
+            // okuyucuya görünmeyen bir eleman, klavyeyle gezinen kullanıcıyı
+            // nerede olduğunu söylemeyen bir noktaya götürür.
+            tabIndex={-1}
             muted
             playsInline
           />
@@ -488,8 +496,7 @@ const errorMessages: Record<ScannerErrorKind, { title: string; detail: string }>
   },
   permission: {
     title: 'Kamera izni verilmedi',
-    detail:
-      'Tarayıcının adres çubuğundaki izin simgesinden kameraya izin verip yeniden başlatın.',
+    detail: 'Tarayıcının adres çubuğundaki izin simgesinden kameraya izin verip yeniden başlatın.',
   },
   'no-camera': {
     title: 'Kamera bulunamadı',

@@ -1,9 +1,9 @@
-import { afterEach, describe, expect, test, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import ProductQuickCard from './ProductQuickCard';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import type { StockLogWithContext } from '@/lib/repo/stock-logs';
 import type { Product } from '@/lib/types';
+import ProductQuickCard from './ProductQuickCard';
 
 /**
  * Ürün kartı ve hızlı düzeltme davranışı.
@@ -57,6 +57,33 @@ function makeLog(overrides: Partial<StockLogWithContext> = {}): StockLogWithCont
   };
 }
 
+/**
+ * Tanım listesindeki bir etiketin karşılık gelen değerini döndürür.
+ *
+ * Önceki sürüm `getByLabelText('Stok')` kullanıyordu ve bu testler GEÇİYORDU;
+ * ancak işaretleme `<p aria-labelledby=...>` olduğu için gerçek ekran
+ * okuyucularda çalışmıyordu — paragraph rolü erişilebilir ad kabul etmiyor.
+ * testing-library adı kendi hesapladığı için hatayı görmüyordu.
+ *
+ * Artık ilişki dt/dd ile tarayıcı anlambiliminden geliyor ve test de aynı yerden
+ * okuyor.
+ *
+ * Rol sorgusu (`getByRole('term')`) KULLANILMIYOR: tarayıcılar `<dt>`yi
+ * erişilebilirlik ağacında `term` olarak eşliyor ama testing-library'nin
+ * dayandığı aria-query eşlemesinde bu rol yok. Yani sorgunun başarısız olması
+ * işaretlemenin yanlış olduğunu göstermiyordu; yapıdan okumak bu boşluğu aşıyor.
+ */
+function valueFor(label: string): HTMLElement {
+  const term = screen.getByText(label, { selector: 'dt' });
+  const value = term.nextElementSibling;
+
+  if (!(value instanceof HTMLElement) || value.tagName !== 'DD') {
+    throw new Error(`"${label}" etiketinin ardından <dd> bulunamadı`);
+  }
+
+  return value;
+}
+
 /** Başarılı bir düzeltme yanıtı döndüren fetch sahtesi. */
 function mockAdjustSuccess(product: Product, logs: StockLogWithContext[] = []) {
   const fetchMock = vi.fn().mockResolvedValue({
@@ -78,11 +105,11 @@ describe('ürün bilgisi gösterimi', () => {
     render(<ProductQuickCard product={makeProduct()} logs={[]} canWrite />);
 
     expect(screen.getByRole('heading', { name: 'Klasik Çekiç 500g' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Satış fiyatı')).toHaveTextContent('290,00 ₺');
+    expect(valueFor('Satış fiyatı')).toHaveTextContent('290,00 ₺');
     expect(screen.getByText('Reyon A - Raf 1')).toBeInTheDocument();
     expect(screen.getByText('ENV-1001')).toBeInTheDocument();
     expect(screen.getByText('8690000000012')).toBeInTheDocument();
-    expect(screen.getByLabelText('Stok')).toHaveTextContent('14 Adet');
+    expect(valueFor('Stok')).toHaveTextContent('14 Adet');
   });
 
   test('kritik stokta uyarı gösterir', () => {
@@ -91,7 +118,7 @@ describe('ürün bilgisi gösterimi', () => {
         product={makeProduct({ stock_quantity: 2, min_stock_alert: 5, is_low_stock: true })}
         logs={[]}
         canWrite
-      />
+      />,
     );
 
     expect(screen.getByText(/kritik eşiğin altında/)).toBeInTheDocument();
@@ -103,7 +130,7 @@ describe('ürün bilgisi gösterimi', () => {
         product={makeProduct({ stock_quantity: 0, is_low_stock: true })}
         logs={[]}
         canWrite
-      />
+      />,
     );
 
     expect(screen.getByText('Bu ürün tükendi.')).toBeInTheDocument();
@@ -136,7 +163,7 @@ describe('hızlı stok düzeltme', () => {
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith(
         '/api/products/42/adjust',
-        expect.objectContaining({ method: 'POST' })
+        expect.objectContaining({ method: 'POST' }),
       );
     });
 
@@ -155,8 +182,11 @@ describe('hızlı stok düzeltme', () => {
       vi.fn().mockImplementation(async () => {
         await pending;
 
-        return { ok: true, json: async () => ({ product: makeProduct({ stock_quantity: 13 }), logs: [] }) };
-      })
+        return {
+          ok: true,
+          json: async () => ({ product: makeProduct({ stock_quantity: 13 }), logs: [] }),
+        };
+      }),
     );
 
     render(<ProductQuickCard product={makeProduct()} logs={[]} canWrite />);
@@ -164,7 +194,7 @@ describe('hızlı stok düzeltme', () => {
 
     // Sunucu daha yanıt vermedi ama ekranda 13 görünmeli.
     await waitFor(() => {
-      expect(screen.getByLabelText('Stok')).toHaveTextContent('13 Adet');
+      expect(valueFor('Stok')).toHaveTextContent('13 Adet');
     });
 
     releaseResponse();
@@ -176,7 +206,7 @@ describe('hızlı stok düzeltme', () => {
       vi.fn().mockResolvedValue({
         ok: false,
         json: async () => ({ error: { message: 'Bu işlem için yetkiniz yok' } }),
-      })
+      }),
     );
 
     render(<ProductQuickCard product={makeProduct()} logs={[]} canWrite />);
@@ -184,7 +214,7 @@ describe('hızlı stok düzeltme', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Bu işlem için yetkiniz yok');
     // Geri alma: stok 14'e dönmeli.
-    expect(screen.getByLabelText('Stok')).toHaveTextContent('14 Adet');
+    expect(valueFor('Stok')).toHaveTextContent('14 Adet');
   });
 
   test('ağ hatasında da geri alınır', async () => {
@@ -194,7 +224,7 @@ describe('hızlı stok düzeltme', () => {
     await userEvent.click(screen.getByRole('button', { name: '+1' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Bağlantı kesildi');
-    expect(screen.getByLabelText('Stok')).toHaveTextContent('14 Adet');
+    expect(valueFor('Stok')).toHaveTextContent('14 Adet');
   });
 
   test('sunucudan dönen değer iyimser tahminin üstüne yazılır', async () => {
@@ -205,7 +235,7 @@ describe('hızlı stok düzeltme', () => {
     await userEvent.click(screen.getByRole('button', { name: '−1' }));
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Stok')).toHaveTextContent('9 Adet');
+      expect(valueFor('Stok')).toHaveTextContent('9 Adet');
     });
   });
 });
@@ -334,7 +364,7 @@ describe('hareket listesi', () => {
           }),
         ]}
         canWrite
-      />
+      />,
     );
 
     expect(screen.getByText('Fiyat güncellendi')).toBeInTheDocument();
@@ -347,7 +377,7 @@ describe('hareket listesi', () => {
         product={makeProduct()}
         logs={[makeLog({ type: 'initial_count', change_amount: 14, old_stock: 0, new_stock: 14 })]}
         canWrite
-      />
+      />,
     );
 
     expect(screen.getByText('İlk kayıt')).toBeInTheDocument();

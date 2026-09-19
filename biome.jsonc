@@ -1,0 +1,109 @@
+{
+  // Biome, ESLint'in yerini aldı. Kazanç yalnızca hız değil: ESLint zinciri
+  // (eslint-config-next -> eslint-plugin-react / typescript-eslint) TypeScript ve
+  // ESLint sürüm yükseltmelerini tıkıyordu. Biome kendi çözümleyicisini
+  // kullandığı için TypeScript sürümünden bağımsız.
+  "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    // .gitignore'daki yollar denetlenmiyor: .next, public/zxing (kopyalanan
+    // 1 MB'lık WASM) ve .env dosyaları zaten dışarıda.
+    "useIgnoreFile": true
+  },
+
+  "files": {
+    // SQL migration'ları ve PNG ikonlar gibi Biome'un tanımadığı dosyalar hata
+    // değil, sessizce atlanıyor.
+    "ignoreUnknown": true,
+    "includes": [
+      "**",
+      "!next-env.d.ts",
+      "!package-lock.json",
+      // Next.js'in ürettiği rota tipleri; bizim biçim kurallarımıza tabi değil.
+      "!.next",
+      // Tailwind 4 at-rule'ları (@theme, @utility, @import "tailwindcss") Biome'un
+      // CSS çözümleyicisinin bilmediği söz dizimi. Dosyayı biçimlendirmeye
+      // çalışmak baskı düzenini bozabilir; CSS zaten elle ve yorumlu yazıldı.
+      "!src/app/globals.css"
+    ]
+  },
+
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    // Varsayılan 80. Mevcut kod ~100'e göre yazılmış ve uzun satırların çoğu
+    // bölünemeyen Tailwind className dizeleri; 100 gereksiz yeniden akışı önlüyor.
+    "lineWidth": 100
+  },
+
+  "javascript": {
+    "formatter": {
+      // Projede 225 tek tırnaklı, 4 çift tırnaklı import var; var olan stil korunuyor.
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "double",
+      "trailingCommas": "all"
+    }
+  },
+
+  "linter": {
+    "enabled": true,
+    "domains": {
+      // Next.js kuralları: istemci bileşeninin async olmaması, <img> yerine
+      // next/image, senkron script'ler.
+      "next": "recommended",
+      // React kuralları: hook bağımlılıkları, hook'un en üstte çağrılması,
+      // dizi indeksinin key olarak kullanılmaması.
+      "react": "recommended",
+      // Vitest farkında: test global'lerini tanıyor, odaklanmış (.only) veya
+      // yinelenen testleri yakalıyor. Depoda unutulan bir `test.only` tüm
+      // takımı sessizce kısaltırdı.
+      "test": "recommended"
+    },
+    "rules": {
+      "preset": "recommended",
+      "complexity": {
+        // KAPALI, çünkü önerdiği dönüşüm TypeScript'in tip daraltmasını bozuyor.
+        // Örnek: `if (!user || user.role !== 'admin') return ...` kalıbından sonra
+        // TypeScript `user`ı non-null olarak daraltıyor ve altındaki kod bunu
+        // kullanıyor. Kural bunu `user?.role !== 'admin'` yapmamızı istiyor; o
+        // biçim daraltma yapmadığı için derleme hatası veriyor ve çözüm olarak
+        // non-null assertion (`!`) eklemek gerekiyor — yani bir kuralı susturmak
+        // için başka bir kuralı ihlal etmek. Biome'un kendisi de bu düzeltmeyi
+        // "unsafe" olarak işaretliyor. Yetki kontrollerinde açık iki koşul,
+        // kısa ama ince bir ifadeye tercih ediliyor.
+        "useOptionalChain": "off"
+      }
+    }
+  },
+
+  "overrides": [
+    {
+      // Testlerde non-null assertion'a izin veriliyor.
+      //
+      // Üretim kodunda `!` gerçek bir risk: varsayım yanlışsa çalışma anında
+      // patlar. Testte ise yanlış varsayım zaten testi düşürür ve bunu yüksek
+      // sesle yapar; `expect(result.error!.issues[0])` yerine her seferinde
+      // koruma yazmak testleri okunmaz hale getiriyor.
+      "includes": ["**/*.test.ts", "**/*.test.tsx", "tests/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noNonNullAssertion": "off"
+          }
+        }
+      }
+    }
+  ],
+
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  }
+}

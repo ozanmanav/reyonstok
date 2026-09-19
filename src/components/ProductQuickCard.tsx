@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useState } from 'react';
+import { useState } from 'react';
 import { formatChange, formatCurrency, formatQuantity, formatTime } from '@/lib/format';
 import type { StockLogWithContext } from '@/lib/repo/stock-logs';
 import { playBeep, vibrate } from '@/lib/sound';
@@ -47,9 +47,6 @@ export default function ProductQuickCard({
   const [error, setError] = useState<string | null>(null);
   const [countValue, setCountValue] = useState('');
   const [priceValue, setPriceValue] = useState('');
-
-  const priceLabelId = useId();
-  const stockLabelId = useId();
 
   /**
    * Sunucuya gitmeden önce kartta gösterilecek tahmini sonucu üretir.
@@ -171,35 +168,31 @@ export default function ProductQuickCard({
           </div>
 
           {/*
-            Değerler görünür etiketlerine aria-labelledby ile bağlı: ekran
-            okuyucu "Satış fiyatı 290,00 ₺" diye okuyor, yoksa sayı bağlamsız
-            kalıyordu.
+            Etiket/değer çiftleri tanım listesi (dl) olarak yazılıyor.
+
+            Önceki sürümde değerler birer <p> idi ve görünür etiketlerine
+            aria-labelledby ile bağlanmıştı. Bu SESSİZCE ETKİSİZDİ: <p>
+            elemanının rolü (paragraph) erişilebilir ad KABUL ETMİYOR, yani ekran
+            okuyucu bağlantıyı yok sayıp sayıyı bağlamsız okuyordu. Testler
+            geçiyordu çünkü testing-library adı kendi hesaplıyor, gerçek yardımcı
+            teknoloji gibi davranmıyor.
+
+            dt/dd ile aynı ilişki ARIA'ya hiç ihtiyaç duymadan, tarayıcının
+            yerleşik anlambilimiyle kuruluyor.
           */}
-          <div className="flex flex-wrap items-end justify-between gap-3">
+          <dl className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <p
-                id={priceLabelId}
-                className="text-xs font-bold uppercase tracking-wider text-zinc-500"
-              >
+              <dt className="text-xs font-bold uppercase tracking-wider text-zinc-500">
                 Satış fiyatı
-              </p>
-              <p
-                aria-labelledby={priceLabelId}
-                className="text-3xl font-black tracking-tight text-emerald-700"
-              >
+              </dt>
+              <dd className="text-3xl font-black tracking-tight text-emerald-700">
                 {formatCurrency(product.sale_price)}
-              </p>
+              </dd>
             </div>
 
             <div className="text-right">
-              <p
-                id={stockLabelId}
-                className="text-xs font-bold uppercase tracking-wider text-zinc-500"
-              >
-                Stok
-              </p>
-              <p
-                aria-labelledby={stockLabelId}
+              <dt className="text-xs font-bold uppercase tracking-wider text-zinc-500">Stok</dt>
+              <dd
                 className={`text-3xl font-black tracking-tight ${
                   product.stock_quantity === 0
                     ? 'text-rose-600'
@@ -210,9 +203,9 @@ export default function ProductQuickCard({
               >
                 {formatQuantity(product.stock_quantity)}{' '}
                 <span className="text-sm font-bold text-zinc-500">{product.unit}</span>
-              </p>
+              </dd>
             </div>
-          </div>
+          </dl>
 
           {product.stock_quantity === 0 ? (
             <p className="rounded-xl bg-rose-50 px-3 py-2 text-xs font-bold text-rose-800">

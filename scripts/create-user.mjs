@@ -1,25 +1,42 @@
 /**
- * İlk yönetici hesabını oluşturur.
+ * Belirtilen rolde bir hesap açar (veya var olan hesabın rolünü günceller).
  *
  * Neden gerekli: veritabanı trigger'ı her yeni kullanıcıyı en kısıtlı rol olan
  * `viewer` ile açıyor. Dolayısıyla sistemde hiç yönetici yokken uygulama
- * içinden yönetici yaratmak mümkün değil. Bu betik yönetim anahtarıyla hesabı
- * açıp rolünü admin'e çekiyor.
+ * içinden yönetici yaratmak mümkün değil; ilk yöneticiyi açacak bir yola
+ * ihtiyaç var. Aynı betik test hesapları açmak için de kullanılıyor.
  *
  * Kullanım:
- *   node scripts/create-admin.mjs eposta@ornek.com "guclu-bir-sifre" "Ad Soyad"
+ *   node scripts/create-user.mjs <eposta> <sifre> [rol] [ad soyad]
+ *
+ * Örnekler:
+ *   node scripts/create-user.mjs patron@magaza.com "guclu-sifre" admin "Ad Soyad"
+ *   node scripts/create-user.mjs kasa@magaza.com "guclu-sifre" staff "Kasa"
+ *
+ * Rol verilmezse `admin` varsayılır.
  *
  * Ortam değişkenleri `.env.local` dosyasından okunur
  * (`vercel env pull .env.local`).
+ *
+ * UYARI: yönetim (service role) anahtarı kullanıyor, RLS'i tamamen aşar.
+ * Yalnızca güvendiğiniz makinede çalıştırın.
  */
 import { createClient } from '@supabase/supabase-js';
 
 process.loadEnvFile('.env.local');
 
-const [email, password, fullName = ''] = process.argv.slice(2);
+const VALID_ROLES = ['admin', 'staff', 'viewer'];
+
+const [email, password, role = 'admin', fullName = ''] = process.argv.slice(2);
 
 if (!email || !password) {
-  console.error('Kullanım: node scripts/create-admin.mjs <eposta> <sifre> [ad soyad]');
+  console.error('Kullanım: node scripts/create-user.mjs <eposta> <sifre> [rol] [ad soyad]');
+  console.error(`Roller: ${VALID_ROLES.join(', ')}`);
+  process.exit(1);
+}
+
+if (!VALID_ROLES.includes(role)) {
+  console.error(`Geçersiz rol: "${role}". Geçerli roller: ${VALID_ROLES.join(', ')}`);
   process.exit(1);
 }
 
@@ -45,6 +62,8 @@ const admin = createClient(url, serviceRoleKey, {
 const { data: created, error: createError } = await admin.auth.admin.createUser({
   email,
   password,
+  // Doğrulama e-postası beklemeden giriş yapılabilsin: hesabı açan kişi zaten
+  // yönetim anahtarına sahip.
   email_confirm: true,
   user_metadata: { full_name: fullName },
 });
@@ -59,7 +78,8 @@ if (createError) {
     process.exit(1);
   }
 
-  // Hesap varsa yalnızca rolünü yükseltiyoruz; betik tekrar çalıştırılabilir olsun.
+  // Hesap varsa şifresini ve rolünü güncelliyoruz; betik tekrar
+  // çalıştırılabilir olsun (şifre unutulduğunda da işe yarıyor).
   const { data: existing, error: lookupError } = await admin
     .from('profiles')
     .select('id')
@@ -72,12 +92,20 @@ if (createError) {
   }
 
   userId = existing.id;
-  console.log('Hesap zaten vardı, rolü yönetici olarak güncelleniyor.');
+
+  const { error: passwordError } = await admin.auth.admin.updateUserById(userId, { password });
+
+  if (passwordError) {
+    console.error('Şifre güncellenemedi:', passwordError.message);
+    process.exit(1);
+  }
+
+  console.log('Hesap zaten vardı; şifresi ve rolü güncellendi.');
 }
 
 const { error: roleError } = await admin
   .from('profiles')
-  .update({ role: 'admin', is_active: true, full_name: fullName || undefined })
+  .update({ role, is_active: true, ...(fullName ? { full_name: fullName } : {}) })
   .eq('id', userId);
 
 if (roleError) {
@@ -85,4 +113,4 @@ if (roleError) {
   process.exit(1);
 }
 
-console.log(`Yönetici hazır: ${email}`);
+console.log(`Hazır: ${email} (${role})`);
